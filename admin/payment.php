@@ -93,11 +93,20 @@ try {
                                     <td><?php echo $ticket['ticket_price']; ?></td>
                                     <td><?php echo $ticket['ticket_status']; ?></td>
                                     <td>
-                                        <a href="#" class="btn btn-info view"
-                                            data-id="<?php echo $ticket['ticket_id']; ?>"
-                                            data-from="<?php echo $ticket['route_from']; ?>"
-                                            data-to="<?php echo $ticket['route_to']; ?>">View</a>
-                                        <a href="#" class="btn btn-danger">Delete</a>
+                                        <?php if ($ticket['ticket_status'] == 'Cancelled') { ?>
+                                            <a href="#" class="btn btn-success view"
+                                                data-id="<?php echo $ticket['ticket_id']; ?>"
+                                                data-from="<?php echo $ticket['route_from']; ?>"
+                                                data-to="<?php echo $ticket['route_to']; ?>">View</a>
+                                            <a href="#" class="btn btn-danger delete-ticket" data-id="<?php echo $ticket['ticket_id']; ?>">Delete</a>
+                                        <?php } else { ?>
+                                            <a href="#" class="btn btn-success view"
+                                                data-id="<?php echo $ticket['ticket_id']; ?>"
+                                                data-from="<?php echo $ticket['route_from']; ?>"
+                                                data-to="<?php echo $ticket['route_to']; ?>">View</a>
+                                            <a href="#" class="btn btn-warning mark-paid" data-id="<?php echo $ticket['ticket_id']; ?>">Paid</a>
+                                            <a href="#" class="btn btn-danger cancel-ticket" data-id="<?php echo $ticket['ticket_id']; ?>">Cancel</a>
+                                        <?php } ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -156,6 +165,175 @@ try {
 
 <?php include 'footer.php' ?>
 
+<!-- CRUD -->
+<script>
+    $(document).on('click', '.mark-paid', function() {
+        var ticket_id = $(this).data('id');
+        if (confirm('Are you sure this ticket is paid?')) {
+            $.ajax({
+                type: 'POST',
+                url: 'mark_paid.php',
+                data: {
+                    ticket_id: ticket_id
+                },
+                success: function(response) {
+                    var res = JSON.parse(response);
+
+                    if (res.status === 'success') {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Ticket status has been updated to Paid.',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        });
+                    } else if (res.status === 'failure') {
+                        // Check if the message is about the ticket not being paid
+                        if (res.message === 'Ticket is not paid') {
+                            Swal.fire({
+                                title: 'Failed!',
+                                text: 'This ticket has not been paid yet.',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Failed!',
+                                text: res.message || 'Failed to update ticket status. Please try again.',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    } else if (res.status === 'error') {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: res.message || 'An unexpected error occurred. Please try again later.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'An error occurred. Please try again later.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        }
+    });
+</script>
+
+<script>
+    $(document).on('click', '.cancel-ticket', function() {
+        var ticket_id = $(this).data('id');
+        if (confirm('Are you sure you want to cancel this ticket?')) {
+            $.ajax({
+                type: 'POST',
+                url: 'cancel_ticket.php',
+                data: {
+                    ticket_id: ticket_id
+                },
+                success: function(response) {
+                    var res = JSON.parse(response);
+
+                    if (res.status === 'success') {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Ticket has been cancelled.',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        });
+                    } else if (res.status === 'failure') {
+                        Swal.fire({
+                            title: 'Failed!',
+                            text: res.message || 'Failed to cancel the ticket. Please try again.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    } else if (res.status === 'error') {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: res.message || 'An unexpected error occurred. Please try again later.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'An error occurred. Please try again later.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        }
+    });
+</script>
+
+<script>
+    $(document).on('click', '.delete-ticket', function() {
+        var ticket_id = $(this).data('id');
+        if (confirm('Are you sure you want to delete this ticket?')) {
+            $.ajax({
+                type: 'POST',
+                url: 'delete_ticket.php', // URL for the PHP delete script
+                data: {
+                    ticket_id: ticket_id
+                },
+                success: function(response) {
+                    var res = JSON.parse(response);
+
+                    if (res.status === 'success') {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Ticket has been deleted.',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload(); // Reload page to reflect changes
+                            }
+                        });
+                    } else if (res.status === 'failure') {
+                        Swal.fire({
+                            title: 'Failed!',
+                            text: res.message || 'Failed to delete the ticket. Please try again.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    } else if (res.status === 'error') {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: res.message || 'An unexpected error occurred. Please try again later.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'An error occurred. Please try again later.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        }
+    });
+</script>
 <script>
     var base_url = "http://localhost/marinetransit/";
 
