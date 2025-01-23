@@ -27,9 +27,9 @@ try {
             t.contact_address,
             s.schedule_date, 
             s.schedule_time, 
-            rf.port_name AS route_from,   -- Alias for route_from port_name
-            rt.port_name AS route_to,     -- Alias for route_to port_name
-            sh.ship_name                 -- Ship name from ships table
+            rf.port_name AS route_from,
+            rt.port_name AS route_to,
+            sh.ship_name
         FROM 
             tickets t
         JOIN 
@@ -37,18 +37,17 @@ try {
         JOIN 
             routes r ON s.route_id = r.route_id
         JOIN 
-            ports rf ON r.route_from = rf.port_id  -- Join ports table for route_from
+            ports rf ON r.route_from = rf.port_id
         JOIN 
-            ports rt ON r.route_to = rt.port_id    -- Join ports table for route_to
+            ports rt ON r.route_to = rt.port_id
         JOIN 
-            ships sh ON s.ship_id = sh.ship_id;    -- Join ships table for ship_name
+            ships sh ON s.ship_id = sh.ship_id
+        GROUP BY 
+            t.ticket_code;
     ";
 
-    // Prepare and execute the query
     $stmt = $conn->prepare($query);
     $stmt->execute();
-
-    // Fetch all results
     $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     echo "Error: " . $e->getMessage();
@@ -73,9 +72,9 @@ try {
                             <th>#</th>
                             <th>Ticket No.</th>
                             <th>Schedule Date/Time</th>
-                            <th>Ship</th> <!-- Ship column updated -->
-                            <th>From</th> <!-- Display the real route_from name -->
-                            <th>To</th> <!-- Display the real route_to name -->
+                            <th>Ship</th>
+                            <th>From</th>
+                            <th>To</th>
                             <th>Total Fare</th>
                             <th>Status</th>
                             <th style="width: 22%;">Action</th>
@@ -94,7 +93,6 @@ try {
                                     <td><?php echo $ticket['ticket_price']; ?></td>
                                     <td><?php echo $ticket['ticket_status']; ?></td>
                                     <td>
-                                        <!-- Add the 'view' class and include data attributes -->
                                         <a href="#" class="btn btn-info view"
                                             data-id="<?php echo $ticket['ticket_id']; ?>"
                                             data-from="<?php echo $ticket['route_from']; ?>"
@@ -239,17 +237,22 @@ try {
                         tr.append('<div class="d-flex justify-content-start" style="border-top: 1px dashed black">' +
                             '<div class="col-xl-4 col-md-4">' +
                             '<div class="h-100 py-2 bg-transparent">' +
+                            '<h6 class="px-5 text-left">Route</h6>' +
                             '<h6 class="px-5 text-left">Cargo Type</h6>' +
                             '<h6 class="px-5 text-left">Model/Brand</h6>' +
                             '<h6 class="px-5 text-left">Plate No.</h6>' +
+                            '<h6 class="px-5 text-left">Vessel</h6>' +
+                            '<h6 class="px-5 text-left">Departure</h6>' +
                             '<h6 class="mt-3 px-5 text-left">Ticket No.</h6>' +
                             '</div></div>' +
                             '<div class="col-xl-8 col-md-8">' +
-                            '<div class="h-100 py-2">: ' + item.passenger_cargo_id + '</h6>' +
+                            '<h6 class="text-left">: ' + ticket_from + '-' + ticket_to + ' </h6>' +
+                            '<h6 class="text-left">: ' + item.accomodation_name + '</h6>' +
                             '<h6 class="text-left">: ' + item.passenger_cargo_brand + '</h6>' +
                             '<h6 class="text-left">: ' + item.passenger_cargo_plate + '</h6>' +
-                            '<h6 class="text-left">: ' + item.ticket_code + '</h6>' +
-                            '</div></div></div>');
+                            '<h6 class="text-left">: ' + item.ship_name + '</h6>' +
+                            '<h6 class="text-left">: ' + item.ticket_date + '</h6>' +
+                            '<h6 class="mt-3 text-left">: ' + item.ticket_code + '</h6>' + '</div></div></div>')
                     });
 
                     $('#printTicket').append(tr);
