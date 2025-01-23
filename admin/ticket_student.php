@@ -40,33 +40,6 @@ if (!isset($admin_id)) {
                     </thead>
                     <tbody>
 
-                        <?php $num = 1;
-                        foreach ($passengers as $value) : ?>
-                            <tr>
-                                <!-- <td><?= $num++; ?></td> -->
-                                <td><?= $value->ticket_code; ?></td>
-                                <td><?php echo date("M d,Y", strtotime($value->schedule_date)) . ' - ' . date("h:i A", strtotime($value->schedule_time)) ?> </td>
-                                <?php $name = $value->passenger_fname . ' ' . $value->passenger_mname . ' ' . $value->passenger_lname ?>
-
-                                <td><?= $name; ?></td>
-                                <td><?= $value->ship_name; ?></td>
-                                <td><?= $portnames[$value->route_from]->port_name; ?></td>
-                                <td><?= $portnames[$value->route_to]->port_name; ?></td>
-                                <td><?= $value->ticket_price; ?></td>
-                                <td><?= $value->ticket_status; ?></td>
-
-                                <td class="text-center">
-
-                                    <a href="#" class="btn btn-success view" data-id="<?= $value->passenger_id; ?>" data-from="<?= $portnames[$value->route_from]->port_name; ?>" data-to="<?= $portnames[$value->route_to]->port_name; ?>">
-                                        <i class="fas fa-eye"> View</i>
-                                    </a>
-                                    <!--  <a href="#" class="btn btn-primary edits" data-id="<?= $value->schedule_id; ?>">
-                                                            <i class="fas fa-edit"> Edit</i>
-                                                        </a> -->
-
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
 
                     </tbody>
                 </table>

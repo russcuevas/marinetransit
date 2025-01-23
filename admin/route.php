@@ -8,12 +8,14 @@ if (!isset($admin_id)) {
     exit;
 }
 
-// Fetch ports data from the database
-$query = "SELECT * FROM ports";  // Assuming you have a 'ports' table
-$stmt = $conn->query($query);
-$ports = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all ports
+// crud
 
-// Fetch existing routes
+//get ports
+$query = "SELECT * FROM ports";
+$stmt = $conn->query($query);
+$ports = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// existing routes
 $route_query = "SELECT r.route_id, r.route_from, r.route_to, 
                        p_from.port_name AS from_port, p_to.port_name AS to_port
                 FROM routes r
@@ -22,7 +24,7 @@ $route_query = "SELECT r.route_id, r.route_from, r.route_to,
 $route_stmt = $conn->query($route_query);
 $routes = $route_stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Handle Add Route
+// add route
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add-route'])) {
     $from_port = $_POST['route_from'];
     $to_port = $_POST['route_to'];
@@ -38,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add-route'])) {
     }
 }
 
-// Handle Update Route
+// update route
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update-route'])) {
     $route_id = $_POST['update_route_id'];
     $from_port = $_POST['update_route_from'];
@@ -83,8 +85,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update-route'])) {
                         <?php foreach ($routes as $route): ?>
                             <tr>
                                 <td><?php echo $route['route_id']; ?></td>
-                                <td><?php echo $route['from_port']; ?></td> <!-- Displays port name -->
-                                <td><?php echo $route['to_port']; ?></td> <!-- Displays port name -->
+                                <td><?php echo $route['from_port']; ?></td>
+                                <td><?php echo $route['to_port']; ?></td>
                                 <td class="text-center">
                                     <a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#editRoute"
                                         data-id="<?php echo $route['route_id']; ?>"

@@ -1,0 +1,155 @@
+<?php
+include '../connection/database.php';
+session_start();
+
+$admin_id = $_SESSION['admin_id'];
+if (!isset($admin_id)) {
+    header('location:admin_login.php');
+}
+
+try {
+    $query = "
+        SELECT 
+            t.ticket_id, 
+            t.ticket_date, 
+            t.ticket_code, 
+            t.ticket_price, 
+            t.ticket_type, 
+            t.ticket_status, 
+            t.schedule_id, 
+            t.user_id, 
+            t.ticket_vehicle, 
+            t.ticket_date_return, 
+            t.schedule_id_return, 
+            t.contact_person, 
+            t.contact_number, 
+            t.contact_email, 
+            t.contact_address,
+            s.schedule_date, 
+            s.schedule_time, 
+            rf.port_name AS route_from,   -- Alias for route_from port_name
+            rt.port_name AS route_to,     -- Alias for route_to port_name
+            sh.ship_name                 -- Ship name from ships table
+        FROM 
+            tickets t
+        JOIN 
+            schedules s ON t.schedule_id = s.schedule_id
+        JOIN 
+            routes r ON s.route_id = r.route_id
+        JOIN 
+            ports rf ON r.route_from = rf.port_id  -- Join ports table for route_from
+        JOIN 
+            ports rt ON r.route_to = rt.port_id    -- Join ports table for route_to
+        JOIN 
+            ships sh ON s.ship_id = sh.ship_id;    -- Join ships table for ship_name
+    ";
+
+    // Prepare and execute the query
+    $stmt = $conn->prepare($query);
+    $stmt->execute();
+
+    // Fetch all results
+    $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo "Error: " . $e->getMessage();
+}
+?>
+<?php include 'header.php' ?>
+
+<!-- Begin Page Content -->
+<div class="container-fluid">
+
+    <!-- DataTales Example -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">All Payment</h6>
+        </div>
+
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Ticket No.</th>
+                            <th>Schedule Date/Time</th>
+                            <th>Ship</th> <!-- Ship column updated -->
+                            <th>From</th> <!-- Display the real route_from name -->
+                            <th>To</th> <!-- Display the real route_to name -->
+                            <th>Total Fare</th>
+                            <th>Status</th>
+                            <th style="width: 22%;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (!empty($tickets)): ?>
+                            <?php foreach ($tickets as $ticket): ?>
+                                <tr>
+                                    <td><?php echo $ticket['ticket_id']; ?></td>
+                                    <td><?php echo $ticket['ticket_code']; ?></td>
+                                    <td><?php echo $ticket['ticket_date'] . " / " . $ticket['schedule_time']; ?></td>
+                                    <td><?php echo $ticket['ship_name']; ?></td>
+                                    <td><?php echo $ticket['route_from']; ?></td>
+                                    <td><?php echo $ticket['route_to']; ?></td>
+                                    <td><?php echo $ticket['ticket_price']; ?></td>
+                                    <td><?php echo $ticket['ticket_status']; ?></td>
+                                    <td>
+                                        <a href="#" class="btn btn-info">View</a>
+                                        <a href="#" class="btn btn-danger">Delete</a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="9">No records found</td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+<!-- /.container-fluid -->
+
+<!-- View Passenger Modal-->
+<div class="modal fade" id="viewPassenger" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">List of Passenger</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="AddPassengerForm" class="user" method="POST">
+                    <div class="row">
+                        <!-- Left-->
+                        <div class="col-xl-12 col-md-6">
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="m-0 font-weight-bold text-primary"></h6>
+                                        <a class="btn btn-primary" id="print"><i class="fas fa-print"></i> </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <div class="mb-3" id="printTicket">
+                                        <!-- Ticket content will be rendered here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="assets/admin/vendor/jquery/jquery.min.js"></script>
+
+<?php include 'footer.php' ?>
