@@ -36,6 +36,30 @@
 
 <!-- Page level custom scripts -->
 <script src="assets/admin/js/demo/datatables-demo.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        <?php if (isset($_SESSION['success'])): ?>
+            Swal.fire({
+                title: 'Success!',
+                text: '<?php echo $_SESSION['success']; ?>',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            })
+            <?php unset($_SESSION['success']); ?>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['error'])): ?>
+            Swal.fire({
+                title: 'Error!',
+                text: '<?php echo $_SESSION['error']; ?>',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            })
+            <?php unset($_SESSION['error']); ?>
+        <?php endif; ?>
+    });
+</script>
 </body>
 
 </html>
