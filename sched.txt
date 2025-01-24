@@ -1,155 +1,233 @@
 <?php
-include '../connection/database.php';
-session_start();
-
-$admin_id = $_SESSION['admin_id'];
-if (!isset($admin_id)) {
-    header('location:admin_login.php');
-}
-
-try {
-    $query = "
-        SELECT 
-            t.ticket_id, 
-            t.ticket_date, 
-            t.ticket_code, 
-            t.ticket_price, 
-            t.ticket_type, 
-            t.ticket_status, 
-            t.schedule_id, 
-            t.user_id, 
-            t.ticket_vehicle, 
-            t.ticket_date_return, 
-            t.schedule_id_return, 
-            t.contact_person, 
-            t.contact_number, 
-            t.contact_email, 
-            t.contact_address,
-            s.schedule_date, 
-            s.schedule_time, 
-            rf.port_name AS route_from,   -- Alias for route_from port_name
-            rt.port_name AS route_to,     -- Alias for route_to port_name
-            sh.ship_name                 -- Ship name from ships table
-        FROM 
-            tickets t
-        JOIN 
-            schedules s ON t.schedule_id = s.schedule_id
-        JOIN 
-            routes r ON s.route_id = r.route_id
-        JOIN 
-            ports rf ON r.route_from = rf.port_id  -- Join ports table for route_from
-        JOIN 
-            ports rt ON r.route_to = rt.port_id    -- Join ports table for route_to
-        JOIN 
-            ships sh ON s.ship_id = sh.ship_id;    -- Join ships table for ship_name
-    ";
-
-    // Prepare and execute the query
-    $stmt = $conn->prepare($query);
-    $stmt->execute();
-
-    // Fetch all results
-    $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    echo "Error: " . $e->getMessage();
-}
+include 'connection/database.php';
 ?>
 <?php include 'header.php' ?>
 
-<!-- Begin Page Content -->
-<div class="container-fluid">
+<!-- Top content -->
+<div class="top-content" style="padding-bottom: 10px">
 
-    <!-- DataTales Example -->
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">All Payment</h6>
-        </div>
+    <div class="col-sm-12 " style="display: flex; justify-content: start; margin-top: 30px; color: white;">
+        <img class="img-profile" src='assets/user/img/backgrounds/icon.jpg' style="height: 70px; width: auto; border-radius: 100%;">
+        <h4 style="font-family: 'Recursive', 'Times New Roman', Times, serif; color: white; margin-left: 10px; font-size: 30px; font-weight: bold"><i>Marinetransport</i></h4>
+    </div>
 
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Ticket No.</th>
-                            <th>Schedule Date/Time</th>
-                            <th>Ship</th> <!-- Ship column updated -->
-                            <th>From</th> <!-- Display the real route_from name -->
-                            <th>To</th> <!-- Display the real route_to name -->
-                            <th>Total Fare</th>
-                            <th>Status</th>
-                            <th style="width: 22%;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (!empty($tickets)): ?>
-                            <?php foreach ($tickets as $ticket): ?>
-                                <tr>
-                                    <td><?php echo $ticket['ticket_id']; ?></td>
-                                    <td><?php echo $ticket['ticket_code']; ?></td>
-                                    <td><?php echo $ticket['ticket_date'] . " / " . $ticket['schedule_time']; ?></td>
-                                    <td><?php echo $ticket['ship_name']; ?></td>
-                                    <td><?php echo $ticket['route_from']; ?></td>
-                                    <td><?php echo $ticket['route_to']; ?></td>
-                                    <td><?php echo $ticket['ticket_price']; ?></td>
-                                    <td><?php echo $ticket['ticket_status']; ?></td>
-                                    <td>
-                                        <a href="#" class="btn btn-info">View</a>
-                                        <a href="#" class="btn btn-danger">Delete</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="9">No records found</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
+    <div class="col-sm-12 " style="display: flex; justify-content: start; margin-top: 0px; color: white; align-items: center;">
+        <img class="img-profile" src='assets/user/img/barko.webp' style="height: 50px; width: auto; border-radius: 100%;">
+        <div style="display: flex; flex-direction: column; justify-content: start; text-align: left;">
+            <u>
+
+                <h4 style="font-family: 'Recursive', 'Times New Roman', Times, serif; color: white; margin-left: 10px; font-size: 30px; font-weight: bold"><i>Sail with Us</i></h4>
+                <h4 style="font-family: 'Recursive', 'Times New Roman', Times, serif; color: white; margin-left: 10px; font-size: 30px; font-weight: bold"><i>02</i></h4>
+            </u>
         </div>
     </div>
 
-</div>
-<!-- /.container-fluid -->
 
-<!-- View Passenger Modal-->
-<div class="modal fade" id="viewPassenger" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">List of Passenger</h5>
-                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
+    <div class="container">
+
+
+        <div class="row">
+            <div class="col-sm-12" style="color: white!important; text-align: left;">
+                <h1 style="color: white!important"><strong><u><i>MarineTransit: Balingoan Port </i></u></strong></h1>
+                <h3 style="color: white!important"><strong><i>Explore Beyond the Waves</i></strong>
+                    <img class="img-profile" src='assets/user/img/wave2.png' style="height: 30px; width: 50px; width: auto; color: blue; margin-left: 10px">
+                </h3>
+                <div style="border-left: 3px white solid; padding-left: 10px;">
+
+                    <h3 style="color: white!important"><strong>Don’t Miss Out! Book Your Balingoan Port Ticket by October 30, 2024</strong></h3>
+
+                    <h3 style="color: white!important"><strong>Sail from October 30 to December 25, 2024, with Balingoan Port Marine Transit!</strong></h3>
+
+                </div>
             </div>
-            <div class="modal-body">
-                <form id="AddPassengerForm" class="user" method="POST">
-                    <div class="row">
-                        <!-- Left-->
-                        <div class="col-xl-12 col-md-6">
-                            <div class="form-group row">
-                                <div class="col-md-12">
-                                    <div class="d-flex justify-content-between">
-                                        <h6 class="m-0 font-weight-bold text-primary"></h6>
-                                        <a class="btn btn-primary" id="print"><i class="fas fa-print"></i> </a>
-                                    </div>
-                                </div>
+        </div>
+
+
+        <div class="container">
+
+            <form id="AddSchedule" class="user" method="POST">
+                <input type="hidden" name="ticket_type" id="ticket_type" value="passenger">
+
+
+                <div style="background: linear-gradient(to right, #8c52ff, #00bf63); padding: 50px 10px; display: flex; flex-direction: column; align-content: space-between; text-align: start; gap: 40px;">
+
+
+                    <div class="col-lg-12" style="background: linear-gradient(to right, #8c52ff, #00bf63); padding: 10px; display: flex; flex-direction: row; align-items: start; text-align: start; justify-content: center;">
+
+                        <div class="col-sm-4" style="display: flex; flex-direction: column; gap: 10px;">
+
+                            <button class="btn btn-info" id="btn1" type="button"><i class="fa fa-user"></i> Passenger</button>
+
+                            <button class="btn btn-info" id="btn2" type="button"><i class="fa fa-car"></i> Car</button>
+                            <div id="radiobutton" style="display: none; flex-direction: row; gap: 10px">
+                                <label style="color: white;display: flex; align-items: center;">
+                                    <input type="radio" name="radiochoice" value="oneway" checked style="width: 25px;height: 25px; margin: 0px; margin-right: 5px;"> One Way
+                                </label>
+
+                                <label style="color: white;display: flex; align-items: center;">
+                                    <input type="radio" name="radiochoice" value="roundtrip" style="width: 25px;height: 25px; margin: 0px; margin-right: 5px;"> Round Trip
+                                </label>
                             </div>
-                            <div class="form-group row">
-                                <div class="col-md-12">
-                                    <div class="mb-3" id="printTicket">
-                                        <!-- Ticket content will be rendered here -->
-                                    </div>
-                                </div>
-                            </div>
+
+
                         </div>
+
+                        <div class="col-sm-4" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="input-group">
+                                <div class="input-group-addon">From</div>
+                                <select class="form-control" name="route_from" id="route_from" required>
+                                    <option value=""></option>
+
+                                </select>
+                            </div>
+
+                            <div class="input-group">
+                                <div class="input-group-addon">To &nbsp;&nbsp;&nbsp;&nbsp;</div>
+                                <select class="form-control" name="route_to" id="route_to" required>
+
+                                </select>
+                            </div>
+
+                        </div>
+
+                        <div class="col-sm-4" style="display: flex; flex-direction: column; gap: 10px;">
+
+
+                            <div class="input-group">
+                                <div class="input-group-addon">Depart</div>
+                                <input class="form-control" required type="date" name="schedule_date" id="schedule_date" min="<?= date('Y-m-d') ?>">
+
+                            </div>
+
+
+                            <div class="input-group" style="display: none;">
+                                <div class="input-group-addon">Return</div>
+                                <input class="form-control schedule_date_return" type="date" name="schedule_date_return" id="schedule_date_return" min="<?= date('Y-m-d') ?>">
+
+                            </div>
+
+                            <div id="section1">
+                                <div class="input-group" style="margin-bottom: 10px">
+                                    <div class="input-group-addon">No. of Passenger</div>
+                                    <input class="form-control" type="number" name="passenger_no" id="passenger_no" min="1">
+
+                                </div>
+                                <button style="float: right;" class="btn btn-info" id="btn2" type="submit"><i class="fa fa-search"></i> Search Trips</button>
+
+
+
+                            </div>
+
+
+
+                            <div class="col-sm-12" id="section1" style="display: flex; flex-direction: row;">
+                                <div class="col-sm-4" style="display: flex; flex-direction: row; gap: 10px;">
+
+                                </div>
+
+
+                                <div class="col-sm-4" style="display: flex; flex-direction: column; gap: 10px;">
+
+                                </div>
+
+                            </div>
+
+
+                        </div>
+
+
                     </div>
-                </form>
-            </div>
+
+
+
+
+
+
+
+                    <div class="col-sm-12" id="section2" style="border: 1px solid black; border: 1px solid black; border-radius: 5px; padding: 10px;">
+
+                        <h4 style="color: white;">Car Information</h4>
+
+                        <div class="row" style="margin-bottom: 20px">
+
+                            <div class="col-sm-4" style="display: flex; flex-direction: column; gap: 10px;">
+                                <div class="input-group">
+                                    <div class="input-group-addon">Category</div>
+
+                                    <select class="form-control" id="cargo_id" name="cargo_id" required>
+
+                                    </select>
+
+                                </div>
+                            </div>
+
+                            <div class="col-sm-4" style="display: flex; flex-direction: column; gap: 10px;">
+                                <div class="input-group">
+                                    <div class="input-group-addon">Brand/Model</div>
+                                    <input class="form-control" type="text" name="passenger_cargo_brand" id="passenger_cargo_brand">
+                                </div>
+                            </div>
+                            <div class="col-sm-4" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;">
+                                <div class="input-group">
+                                    <div class="input-group-addon">Plate No.</div>
+                                    <input class="form-control" type="text" name="passenger_cargo_plate" id="passenger_cargo_plate">
+                                </div>
+                            </div>
+
+
+
+
+
+                            <div class="col-sm-4" style="display: flex; flex-direction: column; gap: 10px;">
+                                <div class="input-group">
+                                    <div class="input-group-addon">No. of Passenger</div>
+                                    <input class="form-control" type="number" name="passenger_no_cargo" id="passenger_no_cargo" min="1">
+                                </div>
+                                <p class="m-0" style="color: white;">(Including Driver)</p>
+                            </div>
+
+
+
+                            <div class="col-sm-4" style="display: flex; flex-direction: column; gap: 10px;">
+
+                                <button class="btn btn-info" id="btn2" type="submit"><i class="fa fa-search"></i> Cargo Trips</button>
+                            </div>
+
+                        </div>
+
+
+
+
+                        <div class="row">
+
+
+
+                        </div>
+
+
+
+                    </div>
+
+
+
+                </div>
+
+
+            </form>
+
+
+
         </div>
     </div>
-</div>
-<script src="assets/admin/vendor/jquery/jquery.min.js"></script>
 
-<?php include 'footer.php' ?>
+
+
+
+
+
+
+    <script src="assets/admin/vendor/jquery/jquery.min.js"></script>
+
+    <script src="assets/user/js/jquery-1.11.1.min.js"></script>
+
+    <?php include 'footer.php' ?>

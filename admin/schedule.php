@@ -43,6 +43,7 @@ $schedule_stmt->closeCursor();
 
 // add schedule
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $schedule_date = $_POST['schedule_date'];
     $schedule_time = $_POST['schedule_time'];
     $ship_id = $_POST['ship_id'];
     $route_id = $_POST['route_id'];
@@ -50,8 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $net_fares = $_POST['net_fare'];
     $max_passengers = $_POST['max_passenger'];
 
-    $stmt = $conn->prepare("INSERT INTO schedules (schedule_time, ship_id, route_id) VALUES (?, ?, ?)");
-    $stmt->execute([$schedule_time, $ship_id, $route_id]);
+    $stmt = $conn->prepare("INSERT INTO schedules (schedule_date, schedule_time, ship_id, route_id) VALUES (?, ?, ?, ?)");
+    $stmt->execute([$schedule_date, $schedule_time, $ship_id, $route_id]);
     $schedule_id = $conn->lastInsertId();
 
     foreach ($accommodations as $index => $accommodation_id) {
@@ -145,6 +146,11 @@ if (isset($_GET['schedule_id'])) {
                     <div class="row">
                         <div class="col-xl-12 col-md-6 mb-4">
                             <div class="form-group row">
+                                <div class="col-md-6">
+                                    <label for="schedule_date">Schedule Date</label>
+                                    <input required class="form-control form-control-solid" type="date" id="schedule_date" name="schedule_date">
+                                </div>
+
                                 <div class="col-md-6">
                                     <label for="schedule_time">Schedule Time</label>
                                     <input required class="form-control form-control-solid" type="time" id="schedule_time" name="schedule_time">

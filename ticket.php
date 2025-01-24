@@ -1,3 +1,6 @@
+<?php
+include 'connection/database.php';
+?>
 <?php include 'header.php' ?>
 
 
@@ -137,6 +140,13 @@
                                 <div class="form-group">
                                     <label for="passenger_bdate">Birthdate</label>
                                     <input type="date" class="form-control form-control-sm" name="passenger_bdate[]" required>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="passenger_type">Age</label>
+                                    <input type="number" class="form-control form-control-sm" name="passenger_type[]" required>
                                 </div>
                             </div>
 

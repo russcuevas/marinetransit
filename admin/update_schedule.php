@@ -8,13 +8,10 @@ if (!isset($admin_id)) {
     exit;
 }
 
-// Fetch the schedule ID from the URL
 if (isset($_GET['schedule_id'])) {
     $schedule_id = $_GET['schedule_id'];
-
-    // Fetch schedule details
     $schedule_query = "
-        SELECT s.schedule_id, s.schedule_time, sh.ship_id, sh.ship_name, r.route_id, 
+        SELECT s.schedule_id, s.schedule_date, s.schedule_time, sh.ship_id, sh.ship_name, r.route_id, 
                p_from.port_name AS from_port, p_to.port_name AS to_port
         FROM schedules s
         JOIN ships sh ON s.ship_id = sh.ship_id
@@ -27,7 +24,6 @@ if (isset($_GET['schedule_id'])) {
     $stmt->execute(['schedule_id' => $schedule_id]);
     $schedule = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Fetch accommodations related to the schedule
     $accom_query = "
         SELECT sa.accomodation_id, a.accomodation_name, sa.net_fare, sa.max_passenger
         FROM schedule_accom sa
@@ -45,15 +41,16 @@ if (isset($_GET['schedule_id'])) {
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $schedule_id = $_POST['schedule_id'];
     $schedule_time = $_POST['schedule_time'];
+    $schedule_date = $_POST['schedule_date']; // Get the schedule date
     $ship_id = $_POST['ship_id'];
     $route_id = $_POST['route_id'];
     $accommodation_ids = $_POST['accommodation_id'];
     $net_fares = $_POST['net_fare'];
     $max_passengers = $_POST['max_passenger'];
 
-    // Update schedule
-    $stmt = $conn->prepare("UPDATE schedules SET schedule_time = ?, ship_id = ?, route_id = ? WHERE schedule_id = ?");
-    $stmt->execute([$schedule_time, $ship_id, $route_id, $schedule_id]);
+    // Update schedule with the schedule date
+    $stmt = $conn->prepare("UPDATE schedules SET schedule_time = ?, schedule_date = ?, ship_id = ?, route_id = ? WHERE schedule_id = ?");
+    $stmt->execute([$schedule_time, $schedule_date, $ship_id, $route_id, $schedule_id]);
 
     // Update accommodations
     foreach ($accommodation_ids as $index => $accommodation_id) {
@@ -83,6 +80,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div class="card-body">
             <form id="UpdateScheduleForm" class="user" method="POST">
                 <input type="hidden" name="schedule_id" value="<?php echo htmlspecialchars($schedule['schedule_id']); ?>">
+
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label for="schedule_date">Schedule Date</label>
+                        <input required class="form-control form-control-solid" type="date" id="schedule_date" name="schedule_date" value="<?php echo $schedule['schedule_date'] ?>">
+                    </div>
+                </div>
 
                 <!-- Schedule Time -->
                 <div class="form-group row">

@@ -1,3 +1,6 @@
+<?php
+include 'connection/database.php';
+?>
 <?php include 'header.php' ?>
 
 
