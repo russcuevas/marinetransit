@@ -19,7 +19,7 @@ $get_report = "
         r.ticket_status,
         s.schedule_time,
         sh.ship_name,
-        r.ticket_price -- Don't use SUM, just take the price for each unique ticket_code
+        r.ticket_price
     FROM 
         reports r
     LEFT JOIN 
@@ -38,10 +38,25 @@ $stmt_get_report->bindValue(':currentDate', $currentDate);
 $stmt_get_report->execute();
 $report = $stmt_get_report->fetchAll(PDO::FETCH_ASSOC);
 
+// Calculate the total ticket price for the current date
 $totalPrice = 0;
 foreach ($report as $reports) {
     $totalPrice += $reports['ticket_price'];
 }
+
+// Now get the sum of all ticket prices for the entire database
+$get_total_price = "
+    SELECT SUM(r.ticket_price) AS total_ticket_price
+    FROM reports r
+    WHERE 1=1 AND DATE(r.report_date) = :currentDate
+";
+
+$stmt_get_total_price = $conn->prepare($get_total_price);
+$stmt_get_total_price->bindValue(':currentDate', $currentDate);
+
+$stmt_get_total_price->execute();
+$total_price_result = $stmt_get_total_price->fetch(PDO::FETCH_ASSOC);
+$totalPrice = $total_price_result['total_ticket_price'];
 
 ?>
 
