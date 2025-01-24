@@ -13,7 +13,7 @@ try {
             t.ticket_id, 
             t.ticket_date, 
             t.ticket_code, 
-            t.ticket_price, 
+            SUM(t.ticket_price) AS ticket_price,  -- Sum of ticket_price for each ticket_code
             t.ticket_type, 
             t.ticket_status, 
             t.schedule_id, 
@@ -95,7 +95,7 @@ try {
                                     <td>
                                         <?php if ($ticket['ticket_status'] == 'Cancelled') { ?>
                                             <a href="#" class="btn btn-success view"
-                                                data-id="<?php echo $ticket['ticket_id']; ?>"
+                                                data-ticket_code="<?php echo $ticket['ticket_code']; ?>"
                                                 data-from="<?php echo $ticket['route_from']; ?>"
                                                 data-to="<?php echo $ticket['route_to']; ?>">View</a>
                                             <a href="#" class="btn btn-danger delete-ticket" data-id="<?php echo $ticket['ticket_id']; ?>">Delete</a>
@@ -120,7 +120,6 @@ try {
             </div>
         </div>
     </div>
-
 </div>
 <!-- /.container-fluid -->
 

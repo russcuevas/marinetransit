@@ -5,6 +5,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ticket_id = $_POST['id'];
 
     try {
+        $ticket_code_query = "SELECT ticket_code FROM tickets WHERE ticket_id = :ticket_id";
+        $ticket_code_stmt = $conn->prepare($ticket_code_query);
+        $ticket_code_stmt->bindParam(':ticket_id', $ticket_id, PDO::PARAM_INT);
+        $ticket_code_stmt->execute();
+        $ticket_code_data = $ticket_code_stmt->fetch(PDO::FETCH_ASSOC);
+        $ticket_code = $ticket_code_data['ticket_code'];
+
         $cargo_check_query = "SELECT * FROM passenger_cargos WHERE ticket_id = :ticket_id";
         $cargo_check_stmt = $conn->prepare($cargo_check_query);
         $cargo_check_stmt->bindParam(':ticket_id', $ticket_id, PDO::PARAM_INT);
@@ -13,34 +20,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($cargo_exists) {
             $cargo_query = "
-        SELECT 
-            pc.passenger_cargo_id,
-            pc.ticket_id,
-            pc.cargo_id,
-            pc.passenger_cargo_brand,
-            pc.passenger_cargo_plate,
-            t.ticket_code, 
-            t.ticket_date,
-            c.cargo_name, 
-            a.accomodation_name,
-            sh.ship_name 
-        FROM 
-            passenger_cargos pc
-        JOIN 
-            tickets t ON pc.ticket_id = t.ticket_id
-        JOIN 
-            cargos c ON pc.cargo_id = c.cargo_id
-        LEFT JOIN 
-            accomodations a ON c.cargo_name = a.accomodation_name
-        JOIN
-            schedules s ON t.schedule_id = s.schedule_id
-        JOIN
-            ships sh ON s.ship_id = sh.ship_id
-        WHERE 
-            pc.ticket_id = :ticket_id
-    ";
+                SELECT 
+                    pc.passenger_cargo_id,
+                    pc.ticket_id,
+                    pc.cargo_id,
+                    pc.passenger_cargo_brand,
+                    pc.passenger_cargo_plate,
+                    t.ticket_code, 
+                    t.ticket_date,
+                    c.cargo_name, 
+                    a.accomodation_name,
+                    sh.ship_name 
+                FROM 
+                    passenger_cargos pc
+                JOIN 
+                    tickets t ON pc.ticket_id = t.ticket_id
+                JOIN 
+                    cargos c ON pc.cargo_id = c.cargo_id
+                LEFT JOIN 
+                    accomodations a ON c.cargo_name = a.accomodation_name
+                JOIN
+                    schedules s ON t.schedule_id = s.schedule_id
+                JOIN
+                    ships sh ON s.ship_id = sh.ship_id
+                WHERE 
+                    t.ticket_code = :ticket_code
+            ";
             $cargo_stmt = $conn->prepare($cargo_query);
-            $cargo_stmt->bindParam(':ticket_id', $ticket_id, PDO::PARAM_INT);
+            $cargo_stmt->bindParam(':ticket_code', $ticket_code, PDO::PARAM_STR);
             $cargo_stmt->execute();
             $cargos = $cargo_stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -71,10 +78,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 JOIN 
                     ships sh ON s.ship_id = sh.ship_id
                 WHERE 
-                    p.ticket_id = :ticket_id
+                    t.ticket_code = :ticket_code
             ";
             $stmt = $conn->prepare($query);
-            $stmt->bindParam(':ticket_id', $ticket_id, PDO::PARAM_INT);
+            $stmt->bindParam(':ticket_code', $ticket_code, PDO::PARAM_STR);
             $stmt->execute();
             $passengers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

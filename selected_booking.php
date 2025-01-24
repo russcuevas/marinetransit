@@ -313,7 +313,7 @@ if (isset($_POST['book'])) {
             <input type="text" name="passenger_bdate[]" value="${formData[3].value}">
             <input type="text" name="passenger_contact[]" value="${formData[4].value}">
             <input type="text" name="passenger_gender[]" value="${formData[5].value}">
-        <input type="text" name="passenger_type[]" value="${$('#passenger_type').val()}"> <!-- Correctly capturing the type -->
+            <input type="text" name="passenger_type[]" value="${$('#passenger_type').val()}"> <!-- Correctly capturing the type -->
             <input type="text" name="passenger_address[]" value="${formData[7].value}">
             <input type="hidden" name="fare[]" value="${accommodationFare}">
 
