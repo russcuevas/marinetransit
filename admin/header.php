@@ -140,12 +140,21 @@ $systeminfo_icon = $system_info['systeminfo_icon'] ? $system_info['systeminfo_ic
                 </a>
             </li>
 
-            <li class="nav-item" id="nav-report">
-                <a class="nav-link" href="report.php">
+            <li class="nav-item" id="nav-reports">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsereports" aria-expanded="false" aria-controls="collapsereports">
                     <i class="fas fa-fw fa-file-alt"></i>
-                    <span>Record</span>
+                    <span>Reports</span>
                 </a>
+                <div id="collapsereports" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item" href="report.php" id="all-records">All records</a>
+                        <a class="collapse-item" href="weekly_records.php" id="weekly-records">Weekly records</a>
+                        <a class="collapse-item" href="daily_records.php" id="daily-records">Daily</a>
+                    </div>
+                </div>
             </li>
+
+
 
             <li class="nav-item" id="nav-settings">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities" aria-expanded="false" aria-controls="collapseUtilities">
@@ -238,52 +247,71 @@ $systeminfo_icon = $system_info['systeminfo_icon'] ? $system_info['systeminfo_ic
                         setActiveLink('nav-ship');
                     }
 
+                    // Check the "Reports" section and activate related items
+                    if (currentURL.includes('report.php')) {
+                        setActiveLink('nav-reports');
+                        showCollapse('collapsereports'); // Show collapse for Reports
+                        setActiveLink('all-records'); // Activate "All records" link
+                    }
+
+                    if (currentURL.includes('weekly_records.php')) {
+                        setActiveLink('nav-reports');
+                        showCollapse('collapsereports');
+                        setActiveLink('weekly-records'); // Activate "Weekly records" link
+                    }
+
+                    if (currentURL.includes('daily_records.php')) {
+                        setActiveLink('nav-reports');
+                        showCollapse('collapsereports');
+                        setActiveLink('daily-records'); // Activate "Daily records" link
+                    }
+
                     // For the Tickets section, check which subpage is active
                     if (currentURL.includes('ticket_free.php')) {
                         setActiveLink('nav-tickets');
-                        setActiveLink('ticket-free'); // Activating the "Free" ticket link
+                        setActiveLink('ticket-free');
                         showCollapse('collapseTickets');
                     }
                     if (currentURL.includes('ticket_regular.php')) {
                         setActiveLink('nav-tickets');
-                        setActiveLink('ticket-regular'); // Activating the "Regular" ticket link
+                        setActiveLink('ticket-regular');
                         showCollapse('collapseTickets');
                     }
                     if (currentURL.includes('ticket_children.php')) {
                         setActiveLink('nav-tickets');
-                        setActiveLink('ticket-children'); // Activating the "Children" ticket link
+                        setActiveLink('ticket-children');
                         showCollapse('collapseTickets');
                     }
                     if (currentURL.includes('ticket_student.php')) {
                         setActiveLink('nav-tickets');
-                        setActiveLink('ticket-student'); // Activating the "Student" ticket link
+                        setActiveLink('ticket-student');
                         showCollapse('collapseTickets');
                     }
                     if (currentURL.includes('ticket_senior.php')) {
                         setActiveLink('nav-tickets');
-                        setActiveLink('ticket-senior'); // Activating the "Senior" ticket link
+                        setActiveLink('ticket-senior');
                         showCollapse('collapseTickets');
                     }
                     if (currentURL.includes('ticket_cargo.php')) {
                         setActiveLink('nav-tickets');
-                        setActiveLink('ticket-cargo'); // Activating the "Cargo" ticket link
+                        setActiveLink('ticket-cargo');
                         showCollapse('collapseTickets');
                     }
 
                     // For the Settings section, check which subpage is active
                     if (currentURL.includes('setting.php')) {
                         setActiveLink('nav-settings');
-                        setActiveLink('setting-system'); // Activating the "System Information" link
+                        setActiveLink('setting-system');
                         showCollapse('collapseUtilities');
                     }
                     if (currentURL.includes('setting_port.php')) {
                         setActiveLink('nav-settings');
-                        setActiveLink('setting-port'); // Activating the "Port Locations" link
+                        setActiveLink('setting-port');
                         showCollapse('collapseUtilities');
                     }
                     if (currentURL.includes('setting_accom.php')) {
                         setActiveLink('nav-settings');
-                        setActiveLink('setting-accom'); // Activating the "Accommodation" link
+                        setActiveLink('setting-accom');
                         showCollapse('collapseUtilities');
                     }
 
@@ -291,6 +319,6 @@ $systeminfo_icon = $system_info['systeminfo_icon'] ? $system_info['systeminfo_ic
                         setActiveLink('nav-payment');
                     }
                     if (currentURL.includes('report.php')) {
-                        setActiveLink('nav-report');
+                        setActiveLink('nav-reports');
                     }
                 </script>

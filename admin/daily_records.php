@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set('Asia/Manila');
 include '../connection/database.php';
 session_start();
 
@@ -7,11 +8,7 @@ if (!isset($admin_id)) {
     header('location:admin_login.php');
 }
 
-// Initialize date filter variables
-$dateFrom = isset($_GET['dateFrom']) ? $_GET['dateFrom'] : null;
-$dateTo = isset($_GET['dateTo']) ? $_GET['dateTo'] : null;
-
-// Build the query with date filter
+$currentDate = date('Y-m-d');
 $get_report = "
     SELECT 
         r.ticket_code,
@@ -21,7 +18,8 @@ $get_report = "
         r.contact_email,
         r.ticket_status,
         s.schedule_time,
-        sh.ship_name 
+        sh.ship_name,
+        r.ticket_price -- Don't use SUM, just take the price for each unique ticket_code
     FROM 
         reports r
     LEFT JOIN 
@@ -30,23 +28,20 @@ $get_report = "
         ships sh ON s.ship_id = sh.ship_id
     WHERE 1=1";
 
-if ($dateFrom) {
-    $get_report .= " AND r.report_date >= :dateFrom";
-}
-if ($dateTo) {
-    $get_report .= " AND r.report_date <= :dateTo";
-}
+$get_report .= " AND DATE(r.report_date) = :currentDate";
 
 $get_report .= " GROUP BY r.ticket_code";
+
 $stmt_get_report = $conn->prepare($get_report);
-if ($dateFrom) {
-    $stmt_get_report->bindValue(':dateFrom', $dateFrom);
-}
-if ($dateTo) {
-    $stmt_get_report->bindValue(':dateTo', $dateTo);
-}
+$stmt_get_report->bindValue(':currentDate', $currentDate);
+
 $stmt_get_report->execute();
 $report = $stmt_get_report->fetchAll(PDO::FETCH_ASSOC);
+
+$totalPrice = 0;
+foreach ($report as $reports) {
+    $totalPrice += $reports['ticket_price'];
+}
 
 ?>
 
@@ -54,28 +49,13 @@ $report = $stmt_get_report->fetchAll(PDO::FETCH_ASSOC);
 
 <!-- Begin Page Content -->
 <div class="container-fluid">
-
-
-    <!-- DataTales Example -->
     <div class="card shadow mb-4">
-        <div class="p-3 d-flex justify-content-between">
-            <div class="d-flex justify-content-start align-items-center">
-                <form method="get" action="" class="d-flex align-items-center">
-                    <div class="mr-3">
-                        <label for="dateFrom" class="mr-2">From</label>
-                        <input value="<?= htmlspecialchars($dateFrom); ?>" class="form-control mr-3" type="date" name="dateFrom" id="dateFrom">
-                    </div>
-                    <div class="mr-3">
-                        <label for="dateTo" class="mr-2">To</label>
-                        <input value="<?= htmlspecialchars($dateTo); ?>" class="form-control mr-3" type="date" name="dateTo" id="dateTo">
-                    </div>
-                    <button class="btn btn-primary" style="margin-top: 34px;" type="submit">Filter</button>
-                </form>
+        <div class="p-3">
+            <div class="d-flex justify-content-between">
+                <h4 style="color: black;">Date Today: <?= $currentDate ?> <br>Total: <?= number_format($totalPrice, 2); ?></h4>
+                <a href="print/daily_reports.php?date=<?= $currentDate ?>" target="_blank" class="fa fa-print text-secondary" style="font-size: 35px; color: inherit; text-decoration: none; cursor: pointer;"></a>
             </div>
-            <a href="print/all_records.php?dateFrom=<?= $dateFrom ?>&dateTo=<?= $dateTo ?>" target="_blank" class="fa fa-print text-secondary" style="font-size: 35px!important; color: inherit; text-decoration: none; cursor: pointer;"></a>
         </div>
-
-
 
         <div class="card-body">
             <div class="table-responsive">
@@ -109,12 +89,8 @@ $report = $stmt_get_report->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 
-
-
 </div>
 <!-- /.container-fluid -->
-
-
 
 <script src="assets/admin/vendor/jquery/jquery.min.js"></script>
 

@@ -11,7 +11,14 @@ if (!isset($admin_id)) {
 $dateFrom = isset($_GET['dateFrom']) ? $_GET['dateFrom'] : null;
 $dateTo = isset($_GET['dateTo']) ? $_GET['dateTo'] : null;
 
-// Build the query with date filter
+// Calculate the current week number
+$currentWeekNumber = date('W'); // Get current week number of the year
+
+// Get the start and end date of the current week
+$startOfWeek = date('Y-m-d', strtotime('last monday'));
+$endOfWeek = date('Y-m-d', strtotime('next sunday'));
+
+// Get the reports for the selected or current week
 $get_report = "
     SELECT 
         r.ticket_code,
@@ -21,7 +28,8 @@ $get_report = "
         r.contact_email,
         r.ticket_status,
         s.schedule_time,
-        sh.ship_name 
+        sh.ship_name,
+        SUM(r.ticket_price) AS total_price -- Use ticket_price instead of total_price
     FROM 
         reports r
     LEFT JOIN 
@@ -30,23 +38,30 @@ $get_report = "
         ships sh ON s.ship_id = sh.ship_id
     WHERE 1=1";
 
-if ($dateFrom) {
-    $get_report .= " AND r.report_date >= :dateFrom";
-}
-if ($dateTo) {
-    $get_report .= " AND r.report_date <= :dateTo";
+// Apply date filter
+if ($dateFrom && $dateTo) {
+    $get_report .= " AND r.report_date BETWEEN :dateFrom AND :dateTo";
+} else {
+    // If no specific date range is selected, filter for the current week
+    $get_report .= " AND WEEK(r.report_date) = WEEK(CURDATE())";
 }
 
 $get_report .= " GROUP BY r.ticket_code";
+
 $stmt_get_report = $conn->prepare($get_report);
-if ($dateFrom) {
+if ($dateFrom && $dateTo) {
     $stmt_get_report->bindValue(':dateFrom', $dateFrom);
-}
-if ($dateTo) {
     $stmt_get_report->bindValue(':dateTo', $dateTo);
 }
+
 $stmt_get_report->execute();
 $report = $stmt_get_report->fetchAll(PDO::FETCH_ASSOC);
+
+// Calculate total ticket price
+$totalPrice = 0;
+foreach ($report as $reports) {
+    $totalPrice += $reports['total_price']; // Sum up the total ticket price
+}
 
 ?>
 
@@ -55,8 +70,7 @@ $report = $stmt_get_report->fetchAll(PDO::FETCH_ASSOC);
 <!-- Begin Page Content -->
 <div class="container-fluid">
 
-
-    <!-- DataTales Example -->
+    <!-- Weekly Reports Card -->
     <div class="card shadow mb-4">
         <div class="p-3 d-flex justify-content-between">
             <div class="d-flex justify-content-start align-items-center">
@@ -72,12 +86,14 @@ $report = $stmt_get_report->fetchAll(PDO::FETCH_ASSOC);
                     <button class="btn btn-primary" style="margin-top: 34px;" type="submit">Filter</button>
                 </form>
             </div>
-            <a href="print/all_records.php?dateFrom=<?= $dateFrom ?>&dateTo=<?= $dateTo ?>" target="_blank" class="fa fa-print text-secondary" style="font-size: 35px!important; color: inherit; text-decoration: none; cursor: pointer;"></a>
+            <a href="print/weekly_reports.php?dateFrom=<?= $dateFrom ?>&dateTo=<?= $dateTo ?>" target="_blank" class="fa fa-print text-secondary" style="font-size: 35px!important; color: inherit; text-decoration: none; cursor: pointer;">
+            </a>
         </div>
 
-
-
         <div class="card-body">
+            <h4 style="color: black;">Week <?= $currentWeekNumber ?> (<?= $startOfWeek ?> to <?= $endOfWeek ?>)</h4>
+            <h5 style="color: black;">Total: <?= number_format($totalPrice, 2); ?> </h5>
+            <br>
             <div class="table-responsive">
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
@@ -109,12 +125,8 @@ $report = $stmt_get_report->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 
-
-
 </div>
 <!-- /.container-fluid -->
-
-
 
 <script src="assets/admin/vendor/jquery/jquery.min.js"></script>
 
