@@ -1,0 +1,23 @@
+SELECT
+    sa.schedule_accom_id,
+    sa.net_fare,
+    a.accomodation_name,
+    a.accomodation_type,
+    a.accomodation_status,
+    s.schedule_id,
+    s.schedule_date,
+    s.schedule_time,
+    r_from.port_name AS route_from,
+    r_to.port_name AS route_to
+FROM
+    schedule_accom sa
+LEFT JOIN
+    accomodations a ON sa.accomodation_id = a.accomodation_id
+LEFT JOIN
+    schedules s ON sa.schedule_id = s.schedule_id
+LEFT JOIN
+    routes r ON s.route_id = r.route_id   -- Assuming there is a routes table linking to route_from and route_to
+LEFT JOIN
+    ports r_from ON r.route_from = r_from.port_id   -- Joining for route_from
+LEFT JOIN
+    ports r_to ON r.route_to = r_to.port_id       -- Joining for route_to

@@ -28,8 +28,6 @@ if (!isset($admin_id)) {
                             <th>#</th>
                             <th>Schedule Date/Time</th>
                             <th>Cargo Type</th>
-                            <th>Model/Type</th>
-                            <th>Plate No.</th>
                             <th>Vessel</th>
                             <th>From</th>
                             <th>To</th>
@@ -67,9 +65,9 @@ if (!isset($admin_id)) {
             <div class="modal-body">
 
                 <form id="AddTicketForm" class="user" method="POST">
-
                     <input type="hidden" name="ticket_type" value="Regular">
                     <input type="hidden" name="passenger_type" value="Child">
+
                     <div class="row">
                         <!-- Left-->
                         <div class="col-xl-12 col-md-6 mb-4">

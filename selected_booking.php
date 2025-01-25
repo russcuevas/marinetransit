@@ -35,7 +35,7 @@ $stmt->execute();
 $accommodation_details = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 if (isset($_POST['book'])) {
-    $ticket_code = uniqid('TICKET-');
+    $ticket_code = uniqid('PASSENGER-');
     $ticket_date = date('Y-m-d H:i:s');
     $ticket_status = 'Pending';
     $contact_person = $_POST['contact_person'];
@@ -135,8 +135,9 @@ if (isset($_POST['book'])) {
                         </thead>
                         <tbody>
                             <form action="" method="POST" id="bookingForm">
+                                <!-- dynamic inputs -->
                                 <div id="passengerDataFields">
-                                    <!-- Dynamically added hidden inputs will go here -->
+
                                 </div>
                                 <?php foreach ($accommodation_details as $accommodation): ?>
                                     <tr>
@@ -304,8 +305,6 @@ if (isset($_POST['book'])) {
 
             const form = $(this);
             const formData = form.serializeArray();
-
-            // Add the passenger data to the hidden input fields
             let hiddenInputs = `
             <input type="text" name="passenger_fname[]" value="${formData[0].value}">
             <input type="text" name="passenger_mname[]" value="${formData[1].value}">
@@ -318,7 +317,7 @@ if (isset($_POST['book'])) {
             <input type="hidden" name="fare[]" value="${accommodationFare}">
 
     `;
-            $('#bookingForm').append(hiddenInputs); // Assuming the form has id="bookingForm"
+            $('#bookingForm').append(hiddenInputs);
 
             const row = `
         <tr>
@@ -328,7 +327,7 @@ if (isset($_POST['book'])) {
             <td>${formData[3].value}</td>
             <td>${formData[4].value}</td>
             <td>${formData[5].value}</td>
-            <td>${$('#passenger_type').val()}</td> <!-- Displaying the type here -->
+            <td>${$('#passenger_type').val()}
             <td>${formData[7].value}</td>
             <td><button class="btn btn-danger">Remove</button></td>
         </tr>`;

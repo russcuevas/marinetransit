@@ -1,14 +1,11 @@
 <?php
 include 'connection/database.php';
 
-// Check if the form has been submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Capture form data
     $route_from = $_POST['route_from'];
     $route_to = $_POST['route_to'];
     $schedule_date = $_POST['schedule_date'];
 
-    // Query to fetch schedules based on selected ports and date, including NULL schedules
     $query = "
         SELECT s.schedule_id, sh.ship_name, s.schedule_time, p_from.port_name AS route_from, p_to.port_name AS route_to
         FROM schedules s
@@ -51,7 +48,9 @@ $ports = $stmt_ports->fetchAll(PDO::FETCH_ASSOC);
                 <div class="col-lg-12" style="background: linear-gradient(to right, #8c52ff, #00bf63); padding: 10px; display: flex; flex-direction: row; align-items: start; text-align: start; justify-content: center;">
                     <div class="col-sm-4" style="display: flex; flex-direction: column; gap: 10px;">
                         <button class="btn btn-info" id="btn1" type="button"><i class="fa fa-user"></i> Passenger</button>
-                        <button class="btn btn-info" id="btn2" type="button"><i class="fa fa-car"></i> Car</button>
+                        <button class="btn btn-info" id="btn2" type="button" onclick="window.location.href='booking_car.php'">
+                            <i class="fa fa-car"></i> Car
+                        </button>
                     </div>
 
                     <div class="col-sm-4" style="display: flex; flex-direction: column; gap: 10px;">
@@ -128,7 +127,6 @@ $ports = $stmt_ports->fetchAll(PDO::FETCH_ASSOC);
             </div>
 
         <?php else: ?>
-            <p style="color: white;">No schedules found for the selected route and date.</p>
         <?php endif; ?>
     </div>
 

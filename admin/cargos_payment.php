@@ -13,7 +13,7 @@ try {
             t.ticket_id, 
             t.ticket_date, 
             t.ticket_code, 
-            SUM(t.ticket_price) AS ticket_price,  -- Sum of ticket_price for each ticket_code
+            t.ticket_price,
             t.ticket_type, 
             t.ticket_status, 
             t.schedule_id, 
@@ -43,7 +43,7 @@ try {
         JOIN 
             ships sh ON s.ship_id = sh.ship_id
         WHERE 
-            t.ticket_code LIKE 'PASSENGER-%'  -- Only show tickets that start with 'PASSENGER-'
+            t.ticket_code LIKE 'CARGO-%'  -- Only show tickets that start with 'CARGO-'
         GROUP BY 
             t.ticket_code;
     ";
@@ -64,7 +64,7 @@ try {
     <!-- DataTales Example -->
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">Passengers Payment</h6>
+            <h6 class="m-0 font-weight-bold text-primary">Cargo Payment</h6>
         </div>
 
         <div class="card-body">
@@ -290,7 +290,7 @@ try {
         if (confirm('Are you sure you want to delete this ticket?')) {
             $.ajax({
                 type: 'POST',
-                url: 'delete_ticket.php', // URL for the PHP delete script
+                url: 'delete_ticket.php',
                 data: {
                     ticket_id: ticket_id
                 },
@@ -305,7 +305,7 @@ try {
                             confirmButtonText: 'OK'
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                location.reload(); // Reload page to reflect changes
+                                location.reload();
                             }
                         });
                     } else if (res.status === 'failure') {
@@ -351,7 +351,7 @@ try {
         $('#viewPassenger').modal('show');
         $.ajax({
             type: 'POST',
-            url: 'http://localhost/marinetransit/admin/getpassengers.php',
+            url: 'http://localhost/marinetransit/admin/getcargo.php', // Change to the cargo-specific endpoint
             dataType: 'json',
             data: {
                 id: id
@@ -360,7 +360,7 @@ try {
                 console.log(response);
                 $('#printTicket').empty();
 
-                if (response.type === 'passenger') {
+                if (response.type === 'cargo') {
                     var tr = $('<div class="py-3 px-0 my-3" style="border: 1px solid black; color: black">');
                     tr.append('<div style="display: flex; margin-bottom: 30px">' +
                         '<div class="col-xl-6 col-md-6">' +
@@ -368,32 +368,26 @@ try {
                         '</div>' +
                         '</div></div>');
 
-                    tr.append('<h4 class="text-center"><b>BOARDING PASS</b></h4>' +
+                    tr.append('<h4 class="text-center"><b>CARGO DETAILS</b></h4>' +
                         '<h6 class="text-center">Super Shuttle Ferry</h6>' +
                         '<h6 class="text-center">38 Gorordo Avenue, Cebu City</h6>' +
                         '<h6 class="text-center">Tel: No. (32) 412-7688</h6>');
 
                     $.each(response.data, function(index, item) {
-                        var passenger_name = item.passenger_fname + ' ' + item.passenger_mname + ' ' + item.passenger_lname;
                         tr.append('<div class="d-flex justify-content-start" style="border-top: 1px dashed black">' +
                             '<div class="col-xl-4 col-md-4">' +
                             '<div class="h-100 py-2 bg-transparent">' +
                             '<h6 class="px-5 text-left">Route</h6>' +
-                            '<h6 class="px-5 text-left">Passenger Name</h6>' +
+                            '<h6 class="px-5 text-left">Cargo Type</h6>' +
                             '<h6 class="px-5 text-left">Vessel</h6>' +
                             '<h6 class="px-5 text-left">Departure</h6>' +
-                            '<h6 class="px-5 text-left">Accommodation</h6>' +
-                            '<h6 class="px-5 text-left">Passenger Type</h6>' +
                             '<h6 class="mt-3 px-5 text-left">Ticket No.</h6>' +
                             '</div></div>' +
                             '<div class="col-xl-8 col-md-8">' +
-                            '<div class="h-100 py-2">' +
-                            '<h6 class="text-left">: ' + ticket_from + ' - ' + ticket_to + '</h6>' +
-                            '<h6 class="text-left">: ' + passenger_name + '</h6>' +
+                            '<h6 class="text-left mt-2">: ' + ticket_from + ' - ' + ticket_to + '</h6>' +
+                            '<h6 class="text-left">: ' + item.accomodation_name + '</h6>' +
                             '<h6 class="text-left">: ' + item.ship_name + '</h6>' +
                             '<h6 class="text-left">: ' + item.ticket_date + '</h6>' +
-                            '<h6 class="text-left">: ECONOMY</h6>' +
-                            '<h6 class="text-left">: ' + item.passenger_type + ' </h6>' +
                             '<h6 class="mt-3 text-left">: ' + item.ticket_code + '</h6>' +
                             '</div></div></div>');
                     });

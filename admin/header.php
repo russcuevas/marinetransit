@@ -134,10 +134,16 @@ $systeminfo_icon = $system_info['systeminfo_icon'] ? $system_info['systeminfo_ic
             </li>
 
             <li class="nav-item" id="nav-payment">
-                <a class="nav-link" href="payment.php">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePayments" aria-expanded="false" aria-controls="collapsePayments">
                     <i class="fa fa-fw fa-dollar-sign"></i>
                     <span>Payments</span>
                 </a>
+                <div id="collapsePayments" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item" href="payment.php" id="passenger-payment">Passenger Payment</a>
+                        <a class="collapse-item" href="cargos_payment.php" id="cargos-payment">Cargos Payment</a>
+                    </div>
+                </div>
             </li>
 
             <li class="nav-item" id="nav-reports">
@@ -212,7 +218,6 @@ $systeminfo_icon = $system_info['systeminfo_icon'] ? $system_info['systeminfo_ic
                 </div>
 
 
-                <!-- script -->
                 <script>
                     // Get the current URL
                     var currentURL = window.location.pathname;
@@ -315,10 +320,22 @@ $systeminfo_icon = $system_info['systeminfo_icon'] ? $system_info['systeminfo_ic
                         showCollapse('collapseUtilities');
                     }
 
+                    // Check for Payments section and activate related items
                     if (currentURL.includes('payment.php')) {
                         setActiveLink('nav-payment');
+                        showCollapse('collapsePayments'); // Show collapse for Payments
+                        setActiveLink('passenger-payment'); // Activate "Passenger Payment" link
+                        // Deactivate the other link
+                        var cargosLink = document.getElementById('cargos-payment');
+                        if (cargosLink) cargosLink.classList.remove('active');
                     }
-                    if (currentURL.includes('report.php')) {
-                        setActiveLink('nav-reports');
+
+                    if (currentURL.includes('cargos_payment.php')) {
+                        setActiveLink('nav-payment');
+                        showCollapse('collapsePayments');
+                        setActiveLink('cargos-payment'); // Activate "Cargos Payment" link
+                        // Deactivate the other link
+                        var passengerLink = document.getElementById('passenger-payment');
+                        if (passengerLink) passengerLink.classList.remove('active');
                     }
                 </script>
