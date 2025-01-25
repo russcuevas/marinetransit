@@ -170,7 +170,7 @@ if (isset($_POST['book'])) {
         <div class="col-md-6">
             <form method="POST" action="">
                 <input type="hidden" value="<?php echo $selected_schedule['schedule_id']; ?>" name="schedule_id">
-                <input type="text" value="<?php echo $selected_schedule['net_fare']; ?>" name="ticket_price">
+                <input type="hidden" value="<?php echo $selected_schedule['net_fare']; ?>" name="ticket_price">
                 <input type="hidden" value="<?php echo $selected_schedule['accomodation_id']; ?>" name="accomodation_id[]">
                 <fieldset>
                     <h4>Contact Information</h4>

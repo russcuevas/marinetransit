@@ -1,8 +1,12 @@
 <?php
+require_once('phpqrcode/qrlib.php');
 include 'connection/database.php';
 
+// Check if schedule_id is passed in the URL
 if (isset($_GET['schedule_id'])) {
     $schedule_id = $_GET['schedule_id'];
+
+    // Fetch schedule details
     $query = "
         SELECT s.schedule_id, sh.ship_name, s.schedule_time, p_from.port_name AS route_from, p_to.port_name AS route_to
         FROM schedules s
@@ -18,8 +22,10 @@ if (isset($_GET['schedule_id'])) {
     $schedule = $stmt->fetch(PDO::FETCH_ASSOC);
 } else {
     echo "No schedule selected.";
+    exit;
 }
 
+// Fetch accommodation details for the selected schedule
 $query = "
     SELECT sa.accomodation_id, a.accomodation_name, sa.net_fare
     FROM schedule_accom sa
@@ -27,14 +33,14 @@ $query = "
     WHERE sa.schedule_id = :schedule_id
     AND a.accomodation_type = 'passenger'
 ";
-
 $stmt = $conn->prepare($query);
 $stmt->bindParam(':schedule_id', $schedule_id, PDO::PARAM_INT);
 $stmt->execute();
-
 $accommodation_details = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Handle the booking form submission
 if (isset($_POST['book'])) {
+    // Generate a unique ticket code and set ticket date and status
     $ticket_code = uniqid('PASSENGER-');
     $ticket_date = date('Y-m-d H:i:s');
     $ticket_status = 'Pending';
@@ -43,6 +49,9 @@ if (isset($_POST['book'])) {
     $contact_email = $_POST['contact_email'];
     $contact_address = $_POST['contact_address'];
 
+    $all_passenger_details = "";
+
+    // Loop through all passengers and insert their details
     foreach ($_POST['passenger_fname'] as $index => $first_name) {
         $last_name = $_POST['passenger_lname'][$index];
         $middle_name = $_POST['passenger_mname'][$index];
@@ -55,11 +64,11 @@ if (isset($_POST['book'])) {
 
         $ticket_price = $accommodation_fare;
 
+        // Insert ticket query
         $insertTicketQuery = "
-            INSERT INTO tickets (ticket_date, ticket_code, ticket_price, ticket_type, ticket_status, schedule_id, contact_person, contact_number, contact_email, contact_address)
-            VALUES (:ticket_date, :ticket_code, :ticket_price, :ticket_type, :ticket_status, :schedule_id, :contact_person, :contact_number, :contact_email, :contact_address)
-        ";
-
+        INSERT INTO tickets (ticket_date, ticket_code, ticket_price, ticket_type, ticket_status, schedule_id, contact_person, contact_number, contact_email, contact_address)
+        VALUES (:ticket_date, :ticket_code, :ticket_price, :ticket_type, :ticket_status, :schedule_id, :contact_person, :contact_number, :contact_email, :contact_address)
+    ";
         $stmt = $conn->prepare($insertTicketQuery);
         $stmt->bindParam(':ticket_date', $ticket_date);
         $stmt->bindParam(':ticket_code', $ticket_code);
@@ -75,11 +84,11 @@ if (isset($_POST['book'])) {
 
         $ticket_id = $conn->lastInsertId();
 
+        // Insert passenger details
         $insertPassengerQuery = "
-            INSERT INTO passengers (ticket_id, passenger_fname, passenger_mname, passenger_lname, passenger_bdate, passenger_contact, passenger_address, passenger_type, passenger_gender)
-            VALUES (:ticket_id, :first_name, :middle_name, :last_name, :birthdate, :contact, :address, :passenger_type, :gender)
-        ";
-
+        INSERT INTO passengers (ticket_id, passenger_fname, passenger_mname, passenger_lname, passenger_bdate, passenger_contact, passenger_address, passenger_type, passenger_gender)
+        VALUES (:ticket_id, :first_name, :middle_name, :last_name, :birthdate, :contact, :address, :passenger_type, :gender)
+    ";
         $stmt = $conn->prepare($insertPassengerQuery);
         $stmt->bindParam(':ticket_id', $ticket_id);
         $stmt->bindParam(':first_name', $first_name);
@@ -91,11 +100,40 @@ if (isset($_POST['book'])) {
         $stmt->bindParam(':passenger_type', $accommodation_type);
         $stmt->bindParam(':gender', $gender);
         $stmt->execute();
+
+        // Concatenate the passenger details for QR code
+        $all_passenger_details .= "Passenger: " . $first_name . " " . $middle_name . " " . $last_name . "\n" .
+            "Contact: " . $contact . "\n" .
+            "Email: " . $contact_email . "\n" .
+            "Fare: " . $accommodation_fare . "\n" .
+            "Accommodation: " . $accommodation_type . "\n\n";
     }
 
-    echo "Booking successful!";
-}
+    // Check if the QR code already exists for the ticket_code
+    $qr_image_path = 'qr_codes/' . $ticket_code . '.png';
 
+    if (!file_exists($qr_image_path)) {
+        if (!file_exists('qr_codes/')) {
+            mkdir('qr_codes/', 0777, true);
+        }
+
+        // Generate the QR code with all passenger details
+        QRcode::png("http://localhost/marinetransit/details.php?ticket_code=" . $ticket_code, $qr_image_path);
+
+        // Update the ticket with the QR code path
+        $updateTicketQuery = "
+        UPDATE tickets 
+        SET qr_code = :qr_code 
+        WHERE ticket_code = :ticket_code
+    ";
+        $stmt = $conn->prepare($updateTicketQuery);
+        $stmt->bindParam(':qr_code', $qr_image_path);
+        $stmt->bindParam(':ticket_code', $ticket_code);
+        $stmt->execute();
+    }
+
+    echo "Booking successful! QR Code generated.";
+}
 ?>
 
 
@@ -135,7 +173,6 @@ if (isset($_POST['book'])) {
                         </thead>
                         <tbody>
                             <form action="" method="POST" id="bookingForm">
-                                <!-- dynamic inputs -->
                                 <div id="passengerDataFields">
 
                                 </div>
