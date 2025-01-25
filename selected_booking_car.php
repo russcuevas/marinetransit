@@ -1,4 +1,5 @@
 <?php
+require_once('phpqrcode/qrlib.php');
 include 'connection/database.php';
 
 if (isset($_GET['schedule_accom_id'])) {
@@ -46,7 +47,7 @@ if (isset($_POST['book'])) {
     $contact_address = $_POST['contact_address'];
     $schedule_id = $_POST['schedule_id'];
 
-    $ticket_type = $_POST['passenger_type'][0];
+    $ticket_type = 'Regular';
 
     $insertTicketQuery = "
         INSERT INTO tickets (ticket_date, ticket_code, ticket_price, ticket_type, ticket_status, schedule_id, contact_person, contact_number, contact_email, contact_address)
@@ -93,42 +94,43 @@ if (isset($_POST['book'])) {
         $stmt->bindParam(':type', $type);
         $stmt->bindParam(':gender', $gender);
         $stmt->execute();
-    }
 
-    if (!empty($_POST['passenger_cargo_brand']) && !empty($_POST['passenger_cargo_plate'])) {
-        foreach ($_POST['passenger_cargo_brand'] as $index => $cargo_brand) {
-            if (!empty($_POST['accomodation_id'][$index])) {
-                $accomodation_id = $_POST['accomodation_id'][$index];
-                $cargo_plate = $_POST['passenger_cargo_plate'][$index];
-                $insertCargoQuery = "
-                INSERT INTO passenger_cargos (ticket_id, accomodation_id, passenger_cargo_brand, passenger_cargo_plate)
-                VALUES (:ticket_id, :accomodation_id, :cargo_brand, :cargo_plate)
-            ";
-                $stmt = $conn->prepare($insertCargoQuery);
-                $stmt->bindParam(':ticket_id', $ticket_id);
-                $stmt->bindParam(':accomodation_id', $accomodation_id);
-                $stmt->bindParam(':cargo_brand', $cargo_brand, PDO::PARAM_NULL);
-                $stmt->bindParam(':cargo_plate', $cargo_plate, PDO::PARAM_NULL);
-                $stmt->execute();
+        $qr_image_path = 'qr_codes/' . $ticket_code . '.png';
+
+        if (!file_exists($qr_image_path)) {
+            if (!file_exists('qr_codes/')) {
+                mkdir('qr_codes/', 0777, true);
             }
-        }
-    } else {
-        if (!empty($_POST['accomodation_id'])) {
-            $insertCargoQuery = "
-            INSERT INTO passenger_cargos (ticket_id, accomodation_id, passenger_cargo_brand, passenger_cargo_plate)
-            VALUES (:ticket_id, :accomodation_id, NULL, NULL)
-        ";
-            $stmt = $conn->prepare($insertCargoQuery);
-            $stmt->bindParam(':ticket_id', $ticket_id);
-            $stmt->bindParam(':accomodation_id', $_POST['accomodation_id'][0]);
+            $qr_content = "http://localhost/marinetransit/details.php?ticket_code=" . $ticket_code . "&passenger_id=" . $conn->lastInsertId();
+            QRcode::png($qr_content, $qr_image_path);
+
+            $updateTicketQuery = "
+                UPDATE tickets 
+                SET qr_code = :qr_code 
+                WHERE ticket_code = :ticket_code
+            ";
+            $stmt = $conn->prepare($updateTicketQuery);
+            $stmt->bindParam(':qr_code', $qr_image_path);
+            $stmt->bindParam(':ticket_code', $ticket_code);
             $stmt->execute();
         }
     }
-    echo "Booking successful!";
+
+    echo "Booking successful! QR Codes generated and saved to the database.";
 }
+
 ?>
 
-<?php include 'header.php'; ?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
 
 <div class="container">
     <div class="row" style="margin-top: 200px;">
@@ -165,10 +167,29 @@ if (isset($_POST['book'])) {
             <?php else: ?>
                 <p>No details found for this booking.</p>
             <?php endif; ?>
+
+            <table class="table table-bordered mt-5" id="passengerTable">
+                <thead>
+                    <tr>
+                        <th>First Name</th>
+                        <th>Middle Name</th>
+                        <th>Last Name</th>
+                        <th>Birthdate</th>
+                        <th>Contact</th>
+                        <th>Gender</th>
+                        <th>Type</th>
+                        <th>Address</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <p id="total-passengers">Total Passengers: </p>
         </div>
 
         <div class="col-md-6">
-            <form method="POST" action="">
+            <form method="POST" action="" id="bookingForm">
                 <input type="hidden" value="<?php echo $selected_schedule['schedule_id']; ?>" name="schedule_id">
                 <input type="hidden" value="<?php echo $selected_schedule['net_fare']; ?>" name="ticket_price">
                 <input type="hidden" value="<?php echo $selected_schedule['accomodation_id']; ?>" name="accomodation_id[]">
@@ -216,60 +237,135 @@ if (isset($_POST['book'])) {
                             <textarea rows="3" class="form-control form-control-sm" name="contact_address" required></textarea>
                         </div>
                     </div>
-
-                    <div class="form-group">
-                        <label for="passenger_fname">First Name</label>
-                        <input type="text" class="form-control form-control-sm" name="passenger_fname[]" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="passenger_mname">Middle Name</label>
-                        <input type="text" class="form-control form-control-sm" name="passenger_mname[]" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="passenger_lname">Last Name</label>
-                        <input type="text" class="form-control form-control-sm" name="passenger_lname[]" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="passenger_bdate">Birthdate</label>
-                        <input type="date" class="form-control form-control-sm" name="passenger_bdate[]" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="passenger_contact">Contact</label>
-                        <input type="text" class="form-control form-control-sm" name="passenger_contact[]">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="passenger_gender">Gender</label>
-                        <select class="form-control form-control-sm" name="passenger_gender[]">
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="passenger_type">Type</label>
-                        <select name="passenger_type[]" id="passenger_type" class="form-control form-control-sm">
-                            <option value="adult">Adult</option>
-                            <option value="Child">Child</option>
-                            <option value="Senior">Senior</option>
-                            <option value="Student">Student</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="passenger_address">Address</label>
-                        <textarea rows="3" class="form-control form-control-sm" name="passenger_address[]" required></textarea>
-                    </div>
-
                     <input type="submit" name="book" value="Book now" class="btn btn-primary">
                 </fieldset>
             </form>
+
+            <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#passengerModal">
+                Add passenger
+            </button>
+
+
+            <div class="modal fade" id="passengerModal" tabindex="-1" aria-labelledby="passengerModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="passengerModalLabel">Passenger Details</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="passengerForm">
+
+                                <div class="form-group">
+                                    <label for="passenger_fname">First Name</label>
+                                    <input type="text" class="form-control form-control-sm" name="passenger_fname" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="passenger_mname">Middle Name</label>
+                                    <input type="text" class="form-control form-control-sm" name="passenger_mname" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="passenger_lname">Last Name</label>
+                                    <input type="text" class="form-control form-control-sm" name="passenger_lname" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="passenger_bdate">Birthdate</label>
+                                    <input type="date" class="form-control form-control-sm" name="passenger_bdate" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="passenger_contact">Contact</label>
+                                    <input type="text" class="form-control form-control-sm" name="passenger_contact">
+                                </div>
+                                <div class="form-group">
+                                    <label for="passenger_gender">Gender</label>
+                                    <select class="form-control form-control-sm" name="passenger_gender">
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="passenger_type">Passenger Type:</label>
+                                    <select name="passenger_type" class="form-control">
+                                        <option value="adult">Adult</option>
+                                        <option value="Child">Child</option>
+                                        <option value="Senior">Senior</option>
+                                        <option value="Student">Student</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="passenger_address">Address</label>
+                                    <textarea rows="3" class="form-control form-control-sm" name="passenger_address" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary mt-3">Save</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<?php include 'footer.php'; ?>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let selectedAccommodationId = null;
+    let accommodationFare = 0;
+
+    function setModalTitle(accommodationName, accommodationId, fare) {
+        document.getElementById('passengerModalLabel').innerText = 'Passenger for ' + accommodationName;
+        document.getElementById('passenger_type').value = accommodationName;
+        selectedAccommodationId = accommodationId;
+        accommodationFare = fare;
+    }
+
+    $('#passengerForm').on('submit', function(e) {
+        e.preventDefault();
+
+        const form = $(this);
+        const formData = form.serializeArray();
+        let hiddenInputs = `
+        <input type="hidden" name="passenger_fname[]" value="${formData[0].value}">
+        <input type="hidden" name="passenger_mname[]" value="${formData[1].value}">
+        <input type="hidden" name="passenger_lname[]" value="${formData[2].value}">
+        <input type="hidden" name="passenger_bdate[]" value="${formData[3].value}">
+        <input type="hidden" name="passenger_contact[]" value="${formData[4].value}">
+        <input type="hidden" name="passenger_gender[]" value="${formData[5].value}">
+        <input type="hidden" name="passenger_type[]" value="${formData[6].value}">
+        <input type="hidden" name="passenger_address[]" value="${formData[7].value}">
+        <input type="hidden" name="fare[]" value="${accommodationFare}">
+    `;
+
+        $('#bookingForm').append(hiddenInputs);
+
+        const row = `
+        <tr>
+            <td>${formData[0].value}</td>
+            <td>${formData[1].value}</td>
+            <td>${formData[2].value}</td>
+            <td>${formData[3].value}</td>
+            <td>${formData[4].value}</td>
+            <td>${formData[5].value}</td>
+            <td>${formData[6].value}</td>
+            <td>${formData[7].value}</td>
+            <td><button class="btn btn-danger remove-passenger">Remove</button></td>
+        </tr>
+    `;
+
+        $('#passengerTable tbody').append(row);
+        updateTotalPassengersCount();
+        $('#passengerModal').modal('hide');
+    });
+
+    function updateTotalPassengersCount() {
+        const totalPassengers = $('#passengerTable tbody tr').length;
+        $('#total-passengers').text(`Total Passengers: ${totalPassengers}`);
+    }
+
+    $(document).on('click', '.remove-passenger', function() {
+        $(this).closest('tr').remove();
+        updateTotalPassengersCount();
+    });
+</script>
