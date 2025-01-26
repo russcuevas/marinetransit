@@ -117,196 +117,289 @@ if (isset($_POST['book'])) {
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking Details</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>Marinetransit</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:200,300,400,600,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/open-iconic-bootstrap.min.css">
+    <link rel="stylesheet" href="css/animate.css">
+    <link rel="stylesheet" href="css/owl.carousel.min.css">
+    <link rel="stylesheet" href="css/owl.theme.default.min.css">
+    <link rel="stylesheet" href="css/magnific-popup.css">
+    <link rel="stylesheet" href="css/aos.css">
+    <link rel="stylesheet" href="css/ionicons.min.css">
+    <link rel="stylesheet" href="css/bootstrap-datepicker.css">
+    <link rel="stylesheet" href="css/jquery.timepicker.css">
+    <link rel="stylesheet" href="css/flaticon.css">
+    <link rel="stylesheet" href="css/icomoon.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6">
-                <h1>Booking Details</h1>
 
-                <?php if (isset($schedule)): ?>
-                    <h3>Schedule Information</h3>
-                    <p><strong>Schedule ID:</strong> <?php echo $schedule['schedule_id']; ?></p>
-                    <p><strong>Ship Name:</strong> <?php echo isset($schedule['ship_name']) ? $schedule['ship_name'] : 'N/A'; ?></p>
-                    <p><strong>Schedule Time:</strong> <?php echo isset($schedule['schedule_time']) ? $schedule['schedule_time'] : 'N/A'; ?></p>
-                    <p><strong>Route From:</strong> <?php echo isset($schedule['route_from']) ? $schedule['route_from'] : 'N/A'; ?></p>
-                    <p><strong>Route To:</strong> <?php echo isset($schedule['route_to']) ? $schedule['route_to'] : 'N/A'; ?></p>
+    <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-dark "
+        style="background-color: #000957 !important;" id="ftco-navbar">
+        <div class="container">
+            <a class="navbar-brand" href="index.php"><img style="height: 50px; border-radius: 50px;"
+                    src="images/bg/icon.jpg" alt="">
+                Marine<span style="color: red;">transit</span></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav"
+                aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="oi oi-menu"></span> Menu
+            </button>
 
-                    <h3>Accommodation Details</h3>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Select Accommodation</th>
-                                <th>Name</th>
-                                <th>Price</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <form action="" method="POST" id="bookingForm">
-                                <div id="passengerDataFields">
+            <div class="collapse navbar-collapse" id="ftco-nav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item"><a href="index.php" class="nav-link">Home</a></li>
+                    <li class="nav-item"><a href="aboutus.php" class="nav-link">About</a></li>
+                    <li class="nav-item"><a href="inspiration.php" class="nav-link">Inspiration</a></li>
+                    <li class="nav-item"><a href="contactus.php" class="nav-link">Contact Us</a></li>
+                    <li class="nav-item"><a href="policy.php" class="nav-link">Privacy Policy</a></li>
+                    <li class="nav-item"><a href="guidelines.php" class="nav-link">FAQ</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- END nav -->
 
-                                </div>
-                                <?php foreach ($accommodation_details as $accommodation): ?>
-                                    <tr>
-                                        <td>
-                                            <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#passengerModal"
-                                                onclick="setModalTitle('<?php echo $accommodation['accomodation_name']; ?>', <?php echo $accommodation['accomodation_id']; ?>, <?php echo $accommodation['net_fare']; ?>)">
-                                                Add passenger
-                                            </button>
-                                        </td>
-                                        <td><?php echo $accommodation['accomodation_name']; ?></td>
-                                        <td id="fare-<?php echo $accommodation['accomodation_id']; ?>"><?php echo number_format($accommodation['net_fare'], 2); ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                <?php else: ?>
-                    <p>Schedule not found.</p>
-                <?php endif; ?>
+    <section class="ftco-section contact-section bg-light">
+        <div class="container">
+            <div class=" text-left">
+
+                <h2>Booking Details</h2>
+                <h5>Route: <?php echo isset($schedule['route_from']) ? $schedule['route_from'] : 'N/A'; ?> -- <?php echo isset($schedule['route_to']) ? $schedule['route_to'] : 'N/A'; ?></h5>
+                <p class="lead">
+                    Please check properly the form before you submit
+                </p>
             </div>
 
-            <div class="col-md-6">
-                <input type="text" value="<?php echo $schedule['schedule_id'] ?>">
-                <fieldset>
-                    <h4>Contact Information</h4>
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="contact_person">Contact Person</label>
-                                    <input type="text" class="form-control form-control-sm" name="contact_person" required>
-                                </div>
+            <div class="row">
+                <div class="col-md-4 order-md-2 mb-4">
+                    <h4 class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted">Schedule Information</span>
+                    </h4>
+                    <ul class="list-group mb-3">
+                        <li class="list-group-item d-flex justify-content-between lh-condensed">
+                            <div>
+                                <img src="images/bg/ssr.jpeg" alt="" class="img-fluid">
+                                <h6 class="my-0 mt-4" style="font-size: 19px;"><?php echo isset($schedule['route_from']) ? $schedule['route_from'] : 'N/A'; ?> -- <?php echo isset($schedule['route_to']) ? $schedule['route_to'] : 'N/A'; ?></h6>
+                                <h6 class="my-0" style="font-size: 19px;"><?php echo isset($schedule['schedule_time']) ? $schedule['schedule_time'] : 'N/A'; ?></h6>
+                                <h6 class="my-0" style="font-size: 19px;"><?php echo isset($schedule['ship_name']) ? $schedule['ship_name'] : 'N/A'; ?></h6>
                             </div>
+                        </li>
 
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="contact_number">Mobile Number</label>
-                                    <input type="text" class="form-control form-control-sm" name="contact_number" required>
-                                </div>
+                    </ul>
+
+                    <div class="card p-2">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Actions</th>
+                                    <th scope="col">Type</th>
+                                    <th scope="col">Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <form class="needs-validation" method="POST" action="" novalidate id="bookingForm">
+                                    <div id="passengerDataFields">
+
+                                    </div>
+                                    <?php foreach ($accommodation_details as $accommodation): ?>
+                                        <tr>
+                                            <td>
+                                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#passengerModal"
+                                                    onclick="setModalTitle('<?php echo $accommodation['accomodation_name']; ?>', '<?php echo $accommodation['accomodation_id']; ?>', '<?php echo $accommodation['net_fare']; ?>')">
+                                                    Add passenger +
+                                                </button>
+                                            </td>
+                                            <td><span class="badge badge-secondary"><?php echo $accommodation['accomodation_name']; ?></span></td>
+                                            <td id="fare-<?php echo $accommodation['accomodation_id']; ?>"><span class="badge badge-danger"><?php echo number_format($accommodation['net_fare'], 2); ?></span></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-8 order-md-1">
+                    <h4 class="mb-3">Contact Infromation</h4>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="contact_person">Contact Person</label>
+                            <input type="text" class="form-control form-control-sm" name="contact_person" required>
+                            <div class="invalid-feedback">
+                                Valid first name is required.
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="contact_number">Mobile Number</label>
+                            <input type="text" class="form-control form-control-sm" name="contact_number" required>
+                            <div class="invalid-feedback">
+                                Valid last name is required.
                             </div>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="contact_email">Email Address</label>
-                                    <input type="email" class="form-control form-control-sm" name="contact_email" required>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="contact_email_confirm">Confirm Email Address</label>
-                                    <input type="email" class="form-control form-control-sm" name="contact_email_confirm">
-                                </div>
-                            </div>
+                    <div class="mb-3">
+                        <label for="contact_email">Email Address</label>
+                        <input type="email" class="form-control form-control-sm" name="contact_email" required>
+                        <div class="invalid-feedback">
+                            Please enter a valid email address for shipping updates.
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <div class="col-md-12">
-                            <label for="contact_address">Address</label>
-                            <textarea rows="3" class="form-control form-control-sm" name="contact_address" required></textarea>
+                    <div class="mb-3">
+                        <label for="contact_email_confirm">Confirm Email Address</label>
+                        <input type="email" class="form-control form-control-sm" name="contact_email_confirm">
+                        <div class="invalid-feedback">
+                            Please enter a valid email address for shipping updates.
                         </div>
                     </div>
 
-                    <table class="table table-bordered mt-5" id="passengerTable">
-                        <thead>
-                            <tr>
-                                <th>First Name</th>
-                                <th>Middle Name</th>
-                                <th>Last Name</th>
-                                <th>Birthdate</th>
-                                <th>Contact</th>
-                                <th>Gender</th>
-                                <th>Type</th>
-                                <th>Address</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-
-                    <p id="totalFare">Total: 0.00</p>
-
-                    <input type="submit" name="book" value="Book now">
-                </fieldset>
-                </form>
-
-                <div class="modal fade" id="passengerModal" tabindex="-1" aria-labelledby="passengerModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="passengerModalLabel">Passenger Details</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <form id="passengerForm">
-
-                                    <div class="form-group">
-                                        <label for="passenger_fname">First Name</label>
-                                        <input type="text" class="form-control form-control-sm" name="passenger_fname" required>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="passenger_mname">Middle Name</label>
-                                        <input type="text" class="form-control form-control-sm" name="passenger_mname" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="passenger_lname">Last Name</label>
-                                        <input type="text" class="form-control form-control-sm" name="passenger_lname" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="passenger_bdate">Birthdate</label>
-                                        <input type="date" class="form-control form-control-sm" name="passenger_bdate" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="passenger_contact">Contact</label>
-                                        <input type="text" class="form-control form-control-sm" name="passenger_contact">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="passenger_gender">Gender</label>
-                                        <select class="form-control form-control-sm" name="passenger_gender">
-                                            <option value="Male">Male</option>
-                                            <option value="Female">Female</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="passenger_type">Type</label>
-                                        <input type="text" class="form-control form-control-sm" name="passenger_type" id="passenger_type" required>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="passenger_address">Address</label>
-                                        <textarea rows="3" class="form-control form-control-sm" name="passenger_address" required></textarea>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary mt-3">Save</button>
-                                </form>
-                            </div>
+                    <div class="mb-3">
+                        <label for="contact_address">Address</label>
+                        <textarea rows="3" class="form-control form-control-sm" name="contact_address"
+                            required></textarea>
+                        <div class="invalid-feedback">
+                            Please enter your shipping address.
                         </div>
+                    </div>
+
+
+                    <hr class="mb-4">
+
+                    <h4 class="mb-3">Passengers <span id="count-passenger">(0)</span></h4>
+
+                    <div class="d-block my-3">
+                        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                            <table class="table table-bordered mt-5" id="passengerTable">
+                                <thead>
+                                    <tr>
+                                        <th>FName</th>
+                                        <th>MName</th>
+                                        <th>LName</th>
+                                        <th>Birthdate</th>
+                                        <th>Contact</th>
+                                        <th>Gender</th>
+                                        <th>Type</th>
+                                        <th>Address</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <p style="text-align: right; font-size: 30px; color: brown;" id="totalFare">Total: 0.00</p>
+                    <button class="btn btn-primary btn-lg btn-block" type="submit" name="book">Booknow</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="passengerModal" tabindex="-1" aria-labelledby="passengerModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="passengerModalLabel">Passenger Details</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="passengerForm">
+                            <div class="row">
+                                <div class="col-md-6 form-group">
+                                    <label for="passenger_fname">First Name</label>
+                                    <input type="text" class="form-control form-control-sm" name="passenger_fname" required>
+                                </div>
+
+                                <div class="col-md-6 form-group">
+                                    <label for="passenger_mname">Middle Name</label>
+                                    <input type="text" class="form-control form-control-sm" name="passenger_mname" required>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 form-group">
+                                    <label for="passenger_lname">Last Name</label>
+                                    <input type="text" class="form-control form-control-sm" name="passenger_lname" required>
+                                </div>
+
+                                <div class="col-md-6 form-group">
+                                    <label for="passenger_bdate">Birthdate</label>
+                                    <input type="date" class="form-control form-control-sm" name="passenger_bdate" required>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 form-group">
+                                    <label for="passenger_contact">Contact</label>
+                                    <input type="text" class="form-control form-control-sm" name="passenger_contact">
+                                </div>
+
+                                <div class="col-md-6 form-group">
+                                    <label for="passenger_gender">Gender</label>
+                                    <select class="form-control form-control-sm" name="passenger_gender">
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 form-group">
+                                    <label for="passenger_type">Type</label>
+                                    <input type="text" style="background-color: gray !important; color: white !important;" class="form-control form-control-sm" name="passenger_type" id="passenger_type" required readonly>
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label for="passenger_address">Address</label>
+                                    <textarea rows="3" class="form-control form-control-sm" name="passenger_address" required></textarea>
+                                </div>
+                            </div>
+                            <button type="submit" style="float: right;" class="btn btn-primary mt-3">Save</button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+
+    </section>
+
+
+
+
+
+
+    <div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px">
+            <circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee" />
+            <circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10"
+                stroke="#F96D00" />
+        </svg></div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquery-migrate-3.0.1.min.js"></script>
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery.easing.1.3.js"></script>
+    <script src="js/jquery.waypoints.min.js"></script>
+    <script src="js/jquery.stellar.min.js"></script>
+    <script src="js/owl.carousel.min.js"></script>
+    <script src="js/jquery.magnific-popup.min.js"></script>
+    <script src="js/aos.js"></script>
+    <script src="js/jquery.animateNumber.min.js"></script>
+    <script src="js/bootstrap-datepicker.js"></script>
+    <script src="js/scrollax.min.js"></script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
+    <script src="js/google-map.js"></script>
+    <script src="js/main.js"></script>
     <script>
         let selectedAccommodationId = null;
         let accommodationFare = 0;
@@ -324,17 +417,17 @@ if (isset($_POST['book'])) {
             const form = $(this);
             const formData = form.serializeArray();
             let hiddenInputs = `
-            <input type="text" name="passenger_fname[]" value="${formData[0].value}">
-            <input type="text" name="passenger_mname[]" value="${formData[1].value}">
-            <input type="text" name="passenger_lname[]" value="${formData[2].value}">
-            <input type="text" name="passenger_bdate[]" value="${formData[3].value}">
-            <input type="text" name="passenger_contact[]" value="${formData[4].value}">
-            <input type="text" name="passenger_gender[]" value="${formData[5].value}">
-            <input type="text" name="passenger_type[]" value="${$('#passenger_type').val()}"> <!-- Correctly capturing the type -->
-            <input type="text" name="passenger_address[]" value="${formData[7].value}">
-            <input type="hidden" name="fare[]" value="${accommodationFare}">
-
+        <input type="text" name="passenger_fname[]" value="${formData[0].value}">
+        <input type="text" name="passenger_mname[]" value="${formData[1].value}">
+        <input type="text" name="passenger_lname[]" value="${formData[2].value}">
+        <input type="text" name="passenger_bdate[]" value="${formData[3].value}">
+        <input type="text" name="passenger_contact[]" value="${formData[4].value}">
+        <input type="text" name="passenger_gender[]" value="${formData[5].value}">
+        <input type="text" name="passenger_type[]" value="${$('#passenger_type').val()}">
+        <input type="text" name="passenger_address[]" value="${formData[7].value}">
+        <input type="hidden" name="fare[]" value="${accommodationFare}">
     `;
+
             $('#bookingForm').append(hiddenInputs);
 
             const row = `
@@ -345,18 +438,54 @@ if (isset($_POST['book'])) {
             <td>${formData[3].value}</td>
             <td>${formData[4].value}</td>
             <td>${formData[5].value}</td>
-            <td>${$('#passenger_type').val()}
+            <td>${$('#passenger_type').val()}</td>
             <td>${formData[7].value}</td>
-            <td><button class="btn btn-danger">Remove</button></td>
+            <td>
+                <button class="btn btn-danger remove-btn">Remove</button>
+                <input type="hidden" class="fare-amount" value="${accommodationFare}">
+            </td>
         </tr>`;
 
             $('#passengerTable tbody').append(row);
 
-            const totalFare = parseFloat($('#totalFare').text().replace('Total: ', '')) + accommodationFare;
-            $('#totalFare').text(`Total: ${totalFare.toFixed(2)}`);
+            const currentTotalFare = parseFloat($('#totalFare').text().replace('Total: ', '')) || 0;
+            const newTotalFare = currentTotalFare + parseFloat(accommodationFare);
+            $('#totalFare').text(`Total: ${newTotalFare.toFixed(2)}`);
+
+            updatePassengerCount();
             $('#passengerModal').modal('hide');
         });
+
+        $('#passengerTable').on('click', '.remove-btn', function() {
+            const row = $(this).closest('tr');
+            const fare = parseFloat(row.find('.fare-amount').val()) || 0;
+
+            row.remove();
+
+            const passengerIndex = row.index();
+            $('#bookingForm input[name="passenger_fname[]"]').eq(passengerIndex).remove();
+            $('#bookingForm input[name="passenger_mname[]"]').eq(passengerIndex).remove();
+            $('#bookingForm input[name="passenger_lname[]"]').eq(passengerIndex).remove();
+            $('#bookingForm input[name="passenger_bdate[]"]').eq(passengerIndex).remove();
+            $('#bookingForm input[name="passenger_contact[]"]').eq(passengerIndex).remove();
+            $('#bookingForm input[name="passenger_gender[]"]').eq(passengerIndex).remove();
+            $('#bookingForm input[name="passenger_type[]"]').eq(passengerIndex).remove();
+            $('#bookingForm input[name="passenger_address[]"]').eq(passengerIndex).remove();
+            $('#bookingForm input[name="fare[]"]').eq(passengerIndex).remove();
+
+            const currentTotalFare = parseFloat($('#totalFare').text().replace('Total: ', '')) || 0;
+            const newTotalFare = currentTotalFare - fare;
+            $('#totalFare').text(`Total: ${newTotalFare.toFixed(2)}`);
+            updatePassengerCount();
+        });
+
+        function updatePassengerCount() {
+            const rowCount = $('#passengerTable tbody tr').length;
+            $('#count-passenger').text(rowCount);
+        }
     </script>
+
+
 </body>
 
 </html>
