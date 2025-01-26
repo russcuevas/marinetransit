@@ -17,7 +17,8 @@ $ticketQuery = "
            GROUP_CONCAT(p.passenger_fname, ' ', p.passenger_lname ORDER BY p.passenger_fname SEPARATOR ', ') AS passengers_names,
            GROUP_CONCAT(p.passenger_contact ORDER BY p.passenger_fname SEPARATOR ', ') AS passengers_contacts,
            GROUP_CONCAT(p.passenger_type ORDER BY p.passenger_fname SEPARATOR ', ') AS passengers_types,
-           GROUP_CONCAT(p.passenger_gender ORDER BY p.passenger_fname SEPARATOR ', ') AS passengers_genders
+           GROUP_CONCAT(p.passenger_gender ORDER BY p.passenger_fname SEPARATOR ', ') AS passengers_genders,
+           t.qr_code
     FROM tickets t
     JOIN schedules s ON t.schedule_id = s.schedule_id
     JOIN ships sh ON s.ship_id = sh.ship_id
@@ -26,11 +27,13 @@ $ticketQuery = "
     JOIN ports p1 ON r1.route_from = p1.port_id
     JOIN ports p2 ON r2.route_to = p2.port_id
     LEFT JOIN passengers p ON t.ticket_id = p.ticket_id
+    WHERE t.ticket_code LIKE '%PASSENGER%'  -- Filtering for ticket codes that contain 'PASSENGER'
     GROUP BY t.ticket_code, t.ticket_status, t.ticket_date, t.contact_person, 
              t.contact_number, t.contact_email, t.contact_address, 
              r1.route_from, r2.route_to, p1.port_name, p2.port_name, 
-             sh.ship_name
+             sh.ship_name, t.qr_code
 ";
+
 
 
 
@@ -57,7 +60,7 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <th>QR</th>
                             <th>Schedule Date</th>
                             <th>Name</th>
                             <th>Ship</th>
@@ -66,13 +69,12 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <th>Total Fare</th>
                             <th>Status</th>
                             <th>Action</th>
-
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($tickets as $index => $ticket): ?>
                             <tr>
-                                <td><?= $index + 1 ?></td>
+                                <td><img style="height: 70px;" src="../qr_codes/<?php echo htmlspecialchars($ticket['qr_code']); ?>" alt="QR Code"></td>
                                 <td><?= htmlspecialchars($ticket['ticket_date']) ?></td>
                                 <td><?= htmlspecialchars($ticket['contact_person']) ?></td>
                                 <td><?= htmlspecialchars($ticket['ship_name']) ?></td>

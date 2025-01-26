@@ -3,52 +3,55 @@ include 'connection/database.php';
 
 if (isset($_GET['ticket_code'])) {
     $ticket_code = $_GET['ticket_code'];
-    $ticketQuery = "
-    SELECT t.ticket_code, SUM(t.ticket_price) AS total_ticket_price, 
-           t.ticket_status, t.schedule_id, t.contact_person, t.contact_number, 
-           t.contact_email, t.contact_address,
-           r1.route_from AS route_from_id, r2.route_to AS route_to_id,
-           p1.port_name AS route_from, p2.port_name AS route_to,
-           sh.ship_name
-    FROM tickets t
-    JOIN schedules s ON t.schedule_id = s.schedule_id
-    JOIN ships sh ON s.ship_id = sh.ship_id
-    JOIN routes r1 ON s.route_id = r1.route_id
-    JOIN routes r2 ON s.route_id = r2.route_id
-    JOIN ports p1 ON r1.route_from = p1.port_id
-    JOIN ports p2 ON r2.route_to = p2.port_id
-    WHERE t.ticket_code = :ticket_code
-    GROUP BY t.ticket_code, t.ticket_status, t.schedule_id, t.contact_person, 
-             t.contact_number, t.contact_email, t.contact_address, 
-             r1.route_from, r2.route_to, p1.port_name, p2.port_name, sh.ship_name
-";
 
-
-    $stmt = $conn->prepare($ticketQuery);
-    $stmt->bindParam(':ticket_code', $ticket_code);
-    $stmt->execute();
-    $ticket = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($ticket) {
-        $passengerQuery = "
-            SELECT p.passenger_fname, p.passenger_mname, p.passenger_lname, p.passenger_bdate, 
-                   p.passenger_contact, p.passenger_address, p.passenger_type, p.passenger_gender
-            FROM passengers p
-            JOIN tickets t ON p.ticket_id = t.ticket_id
-            WHERE t.ticket_code = :ticket_code
+    if (strpos($ticket_code, 'PASSENGER-') === 0) {
+        $ticketQuery = "
+        SELECT t.ticket_code, SUM(t.ticket_price) AS total_ticket_price, 
+               t.ticket_status, t.schedule_id, t.contact_person, t.contact_number, 
+               t.contact_email, t.contact_address,
+               r1.route_from AS route_from_id, r2.route_to AS route_to_id,
+               p1.port_name AS route_from, p2.port_name AS route_to,
+               sh.ship_name
+        FROM tickets t
+        JOIN schedules s ON t.schedule_id = s.schedule_id
+        JOIN ships sh ON s.ship_id = sh.ship_id
+        JOIN routes r1 ON s.route_id = r1.route_id
+        JOIN routes r2 ON s.route_id = r2.route_id
+        JOIN ports p1 ON r1.route_from = p1.port_id
+        JOIN ports p2 ON r2.route_to = p2.port_id
+        WHERE t.ticket_code = '$ticket_code'
+        GROUP BY t.ticket_code, t.ticket_status, t.schedule_id, t.contact_person, 
+                 t.contact_number, t.contact_email, t.contact_address, 
+                 r1.route_from, r2.route_to, p1.port_name, p2.port_name, sh.ship_name
         ";
 
-        $stmt = $conn->prepare($passengerQuery);
-        $stmt->bindParam(':ticket_code', $ticket_code);
+        $stmt = $conn->prepare($ticketQuery);
         $stmt->execute();
-        $passengers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $ticket = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($ticket) {
+            $passengerQuery = "
+                SELECT p.passenger_fname, p.passenger_mname, p.passenger_lname, p.passenger_bdate, 
+                       p.passenger_contact, p.passenger_address, p.passenger_type, p.passenger_gender
+                FROM passengers p
+                JOIN tickets t ON p.ticket_id = t.ticket_id
+                WHERE t.ticket_code = '$ticket_code'
+            ";
+
+            $stmt = $conn->prepare($passengerQuery);
+            $stmt->execute();
+            $passengers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            $error_message = "Ticket not found.";
+        }
     } else {
-        $error_message = "Ticket not found.";
+        $error_message = "Ticket code is missing.";
     }
 } else {
     $error_message = "Ticket code is missing.";
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">

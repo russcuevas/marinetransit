@@ -26,11 +26,11 @@ if (isset($_GET['schedule_id']) && !empty($_GET['schedule_id'])) {
     $schedule = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$schedule) {
-        header('Location: booknow.php');
+        header('Location: select_schedules.php');
         exit;
     }
 } else {
-    header('Location: booknow.php');
+    header('Location: select_schedules.php');
     exit;
 }
 
