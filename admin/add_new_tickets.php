@@ -1,6 +1,12 @@
 <?php
-require_once('phpqrcode/qrlib.php');
-include 'connection/database.php';
+require_once('../phpqrcode/qrlib.php');
+include '../connection/database.php';
+session_start();
+
+$admin_id = $_SESSION['admin_id'];
+if (!isset($admin_id)) {
+    header('location:admin_login.php');
+}
 
 if (isset($_GET['schedule_id']) && !empty($_GET['schedule_id'])) {
     $schedule_id = $_GET['schedule_id'];
@@ -44,11 +50,13 @@ $accommodation_details = $stmt->fetchAll(PDO::FETCH_ASSOC);
 if (isset($_POST['book'])) {
     $ticket_code = uniqid('PASSENGER-');
     $ticket_date = date('Y-m-d H:i:s');
-    $ticket_status = 'Pending';
+    $ticket_status = 'Paid';
     $contact_person = $_POST['contact_person'];
     $contact_number = $_POST['contact_number'];
     $contact_email = $_POST['contact_email'];
     $contact_address = $_POST['contact_address'];
+
+    $ticket_ids = []; // Array to store ticket ids for reports
 
     if (isset($_POST['passenger_fname']) && is_array($_POST['passenger_fname']) && !empty($_POST['passenger_fname'])) {
         foreach ($_POST['passenger_fname'] as $index => $first_name) {
@@ -79,14 +87,17 @@ if (isset($_POST['book'])) {
             $stmt->bindParam(':contact_address', $contact_address);
             $stmt->execute();
 
-            $ticket_id = $conn->lastInsertId();
+            $ticket_id = $conn->lastInsertId(); // Retrieve ticket id
+
+            // Store the ticket_id for reports insertion
+            $ticket_ids[] = $ticket_id;
 
             $insertPassengerQuery = "
                 INSERT INTO passengers (ticket_id, passenger_fname, passenger_mname, passenger_lname, passenger_bdate, passenger_contact, passenger_address, passenger_type, passenger_gender)
                 VALUES (:ticket_id, :first_name, :middle_name, :last_name, :birthdate, :contact, :address, :passenger_type, :gender)
             ";
             $stmt = $conn->prepare($insertPassengerQuery);
-            $stmt->bindParam(':ticket_id', $ticket_id);
+            $stmt->bindParam(':ticket_id', $ticket_id); // Bind ticket_id for each passenger
             $stmt->bindParam(':first_name', $first_name);
             $stmt->bindParam(':middle_name', $middle_name);
             $stmt->bindParam(':last_name', $last_name);
@@ -98,29 +109,101 @@ if (isset($_POST['book'])) {
             $stmt->execute();
         }
 
-        $qr_image_directory = 'qr_codes/'; // Directory for storing QR codes
-        $qr_image_filename = $ticket_code . '.png'; // Only the filename
-        $qr_image_path = $qr_image_directory . $qr_image_filename; // Full path for file creation
+        // Insert into the reports table for each ticket
+        foreach ($ticket_ids as $ticket_id) {
+            // Retrieve ticket price and other details based on ticket_id
+            $ticketQuery = "
+        SELECT ticket_price, ticket_code FROM tickets WHERE ticket_id = :ticket_id
+    ";
+            $stmt = $conn->prepare($ticketQuery);
+            $stmt->bindParam(':ticket_id', $ticket_id);
+            $stmt->execute();
+            $ticketData = $stmt->fetch(PDO::FETCH_ASSOC);  // Fetch ticket details for this ticket_id
+
+            // Retrieve passenger types based on ticket_id
+            $passengerQuery = "
+        SELECT passenger_type FROM passengers WHERE ticket_id = :ticket_id
+    ";
+            $stmt = $conn->prepare($passengerQuery);
+            $stmt->bindParam(':ticket_id', $ticket_id);
+            $stmt->execute();
+            $passenger_types = $stmt->fetchAll(PDO::FETCH_COLUMN); // Get all passenger types for this ticket
+
+            // Now insert reports for each passenger type under this ticket
+            foreach ($passenger_types as $accommodation_type) {
+                $insertReportQuery = "
+            INSERT INTO reports (
+                ticket_code, 
+                ticket_price, 
+                ticket_type, 
+                ticket_status, 
+                schedule_id, 
+                user_id, 
+                ticket_vehicle, 
+                contact_person, 
+                contact_number, 
+                contact_email, 
+                contact_address,
+                report_date
+            ) VALUES (
+                :ticket_code, 
+                :ticket_price, 
+                :ticket_type, 
+                CASE WHEN :ticket_status = 'Paid' THEN 'Completed' ELSE :ticket_status END,  
+                :schedule_id, 
+                :user_id, 
+                :ticket_vehicle, 
+                :contact_person, 
+                :contact_number, 
+                :contact_email, 
+                :contact_address,
+                NOW()
+            )
+        ";
+
+                // Prepare the insert statement for reports
+                $stmt = $conn->prepare($insertReportQuery);
+                $stmt->bindParam(':ticket_code', $ticketData['ticket_code']); // Use ticket code from the tickets table
+                $stmt->bindParam(':ticket_price', $ticketData['ticket_price']); // Use the ticket price from the tickets table
+                $stmt->bindParam(':ticket_type', $accommodation_type); // Use the specific passenger type for this record
+                $stmt->bindParam(':ticket_status', $ticket_status); // 'Paid' will be replaced with 'Completed' in the query
+                $stmt->bindParam(':schedule_id', $schedule_id);
+                $stmt->bindParam(':user_id', $user_id); // Make sure user_id is available
+                $stmt->bindParam(':ticket_vehicle', $ticket_vehicle); // Make sure ticket_vehicle is available
+                $stmt->bindParam(':contact_person', $contact_person);
+                $stmt->bindParam(':contact_number', $contact_number);
+                $stmt->bindParam(':contact_email', $contact_email);
+                $stmt->bindParam(':contact_address', $contact_address);
+                $stmt->execute();
+            }
+        }
+
+
+        $qr_image_directory = '../qr_codes/';
+        $qr_image_filename = $ticket_code . '.png';
+        $qr_image_path = $qr_image_directory . $qr_image_filename;
+
+        if (!file_exists($qr_image_directory)) {
+            mkdir($qr_image_directory, 0777, true);
+        }
 
         if (!file_exists($qr_image_path)) {
-            if (!file_exists($qr_image_directory)) {
-                mkdir($qr_image_directory, 0777, true);
-            }
             QRcode::png(
                 "http://localhost/marinetransit/details.php?ticket_code=" . $ticket_code,
                 $qr_image_path
             );
 
             $updateTicketQuery = "
-        UPDATE tickets 
-        SET qr_code = :qr_code 
-        WHERE ticket_code = :ticket_code
-    ";
+                UPDATE tickets 
+                SET qr_code = :qr_code 
+                WHERE ticket_code = :ticket_code
+            ";
             $stmt = $conn->prepare($updateTicketQuery);
-            $stmt->bindParam(':qr_code', $qr_image_filename); // Save only the filename
+            $stmt->bindParam(':qr_code', $qr_image_filename);
             $stmt->bindParam(':ticket_code', $ticket_code);
             $stmt->execute();
         }
+
         $_SESSION['success'] = 'Booking successfully!';
     } else {
         $_SESSION['error'] = 'Please add at least one passenger.';
@@ -128,64 +211,19 @@ if (isset($_POST['book'])) {
 }
 
 ?>
+<?php include 'header.php' ?>
 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <title>Marinetransit</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:200,300,400,600,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/open-iconic-bootstrap.min.css">
-    <link rel="stylesheet" href="css/animate.css">
-    <link rel="stylesheet" href="css/owl.carousel.min.css">
-    <link rel="stylesheet" href="css/owl.theme.default.min.css">
-    <link rel="stylesheet" href="css/magnific-popup.css">
-    <link rel="stylesheet" href="css/aos.css">
-    <link rel="stylesheet" href="css/ionicons.min.css">
-    <link rel="stylesheet" href="css/bootstrap-datepicker.css">
-    <link rel="stylesheet" href="css/jquery.timepicker.css">
-    <link rel="stylesheet" href="css/flaticon.css">
-    <link rel="stylesheet" href="css/icomoon.css">
-    <link rel="stylesheet" href="css/style.css">
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-
-</head>
-
-<body>
-
-    <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-dark "
-        style="background-color: #000957 !important;" id="ftco-navbar">
-        <div class="container">
-            <a class="navbar-brand" href="index.php"><img style="height: 50px; border-radius: 50px;"
-                    src="images/bg/icon.jpg" alt="">
-                Marine<span style="color: red;">transit</span></a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav"
-                aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="oi oi-menu"></span> Menu
-            </button>
-
-            <div class="collapse navbar-collapse" id="ftco-nav">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item"><a href="index.php" class="nav-link">Home</a></li>
-                    <li class="nav-item"><a href="aboutus.php" class="nav-link">About</a></li>
-                    <li class="nav-item"><a href="inspiration.php" class="nav-link">Inspiration</a></li>
-                    <li class="nav-item"><a href="contactus.php" class="nav-link">Contact Us</a></li>
-                    <li class="nav-item"><a href="policy.php" class="nav-link">Privacy Policy</a></li>
-                    <li class="nav-item"><a href="guidelines.php" class="nav-link">FAQ</a></li>
-                </ul>
-            </div>
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Add tickets</h6>
         </div>
-    </nav>
-    <!-- END nav -->
 
-    <section class="ftco-section contact-section bg-light">
         <div class="container">
             <div class=" text-left">
 
-                <h2>Booking Details</h2>
-                <h5>Route: <?php echo isset($schedule['route_from']) ? $schedule['route_from'] : 'N/A'; ?> -- <?php echo isset($schedule['route_to']) ? $schedule['route_to'] : 'N/A'; ?></h5>
+                <h5 style="margin-top: 20px; font-size: 40px"><?php echo isset($schedule['route_from']) ? $schedule['route_from'] : 'N/A'; ?> -- <?php echo isset($schedule['route_to']) ? $schedule['route_to'] : 'N/A'; ?></h5>
                 <p class="lead">
                     Please check properly the form before you submit
                 </p>
@@ -199,7 +237,7 @@ if (isset($_POST['book'])) {
                     <ul class="list-group mb-3">
                         <li class="list-group-item d-flex justify-content-between lh-condensed">
                             <div>
-                                <img src="images/bg/ssr.jpeg" alt="" class="img-fluid">
+                                <img src="../images/bg/ssr.jpeg" alt="" class="img-fluid">
                                 <h6 class="my-0 mt-4" style="font-size: 19px;"><?php echo isset($schedule['route_from']) ? $schedule['route_from'] : 'N/A'; ?> -- <?php echo isset($schedule['route_to']) ? $schedule['route_to'] : 'N/A'; ?></h6>
                                 <h6 class="my-0" style="font-size: 19px;"><?php echo isset($schedule['schedule_time']) ? $schedule['schedule_time'] : 'N/A'; ?></h6>
                                 <h6 class="my-0" style="font-size: 19px;"><?php echo isset($schedule['ship_name']) ? $schedule['ship_name'] : 'N/A'; ?></h6>
@@ -309,7 +347,7 @@ if (isset($_POST['book'])) {
                         </div>
                     </div>
                     <p style="text-align: right; font-size: 30px; color: brown;" id="totalFare">Total: 0.00</p>
-                    <button class="btn btn-primary btn-lg btn-block" type="submit" name="book">Booknow</button>
+                    <button class="btn btn-primary btn-lg btn-block" type="submit" name="book">Add ticket</button>
                     </form>
                 </div>
             </div>
@@ -381,80 +419,29 @@ if (isset($_POST['book'])) {
                 </div>
             </div>
         </div>
+    </div>
+</div>
 
-    </section>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
+<script src="assets/admin/vendor/jquery/jquery.min.js"></script>
+<script>
+    let selectedAccommodationId = null;
+    let accommodationFare = 0;
 
+    function setModalTitle(accommodationName, accommodationId, fare) {
+        document.getElementById('passengerModalLabel').innerText = 'Passenger for ' + accommodationName;
+        document.getElementById('passenger_type').value = accommodationName;
+        selectedAccommodationId = accommodationId;
+        accommodationFare = fare;
+    }
 
+    $('#passengerForm').on('submit', function(e) {
+        e.preventDefault();
 
-
-
-    <div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px">
-            <circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee" />
-            <circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10"
-                stroke="#F96D00" />
-        </svg></div>
-
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/jquery.min.js"></script>
-    <script src="js/jquery-migrate-3.0.1.min.js"></script>
-    <script src="js/popper.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/jquery.easing.1.3.js"></script>
-    <script src="js/jquery.waypoints.min.js"></script>
-    <script src="js/jquery.stellar.min.js"></script>
-    <script src="js/owl.carousel.min.js"></script>
-    <script src="js/jquery.magnific-popup.min.js"></script>
-    <script src="js/aos.js"></script>
-    <script src="js/jquery.animateNumber.min.js"></script>
-    <script src="js/bootstrap-datepicker.js"></script>
-    <script src="js/scrollax.min.js"></script>
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
-    <script src="js/google-map.js"></script>
-    <script src="js/main.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            <?php if (isset($_SESSION['success'])): ?>
-                Swal.fire({
-                    title: 'Success!',
-                    text: '<?php echo $_SESSION['success']; ?>',
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                })
-                <?php unset($_SESSION['success']); ?>
-            <?php endif; ?>
-
-            <?php if (isset($_SESSION['error'])): ?>
-                Swal.fire({
-                    title: 'Error!',
-                    text: '<?php echo $_SESSION['error']; ?>',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                })
-                <?php unset($_SESSION['error']); ?>
-            <?php endif; ?>
-        });
-    </script>
-    <script>
-        let selectedAccommodationId = null;
-        let accommodationFare = 0;
-
-        function setModalTitle(accommodationName, accommodationId, fare) {
-            document.getElementById('passengerModalLabel').innerText = 'Passenger for ' + accommodationName;
-            document.getElementById('passenger_type').value = accommodationName;
-            selectedAccommodationId = accommodationId;
-            accommodationFare = fare;
-        }
-
-        $('#passengerForm').on('submit', function(e) {
-            e.preventDefault();
-
-            const form = $(this);
-            const formData = form.serializeArray();
-            let hiddenInputs = `
+        const form = $(this);
+        const formData = form.serializeArray();
+        let hiddenInputs = `
         <input type="text" name="passenger_fname[]" value="${formData[0].value}">
         <input type="text" name="passenger_mname[]" value="${formData[1].value}">
         <input type="text" name="passenger_lname[]" value="${formData[2].value}">
@@ -466,9 +453,9 @@ if (isset($_POST['book'])) {
         <input type="hidden" name="fare[]" value="${accommodationFare}">
     `;
 
-            $('#bookingForm').append(hiddenInputs);
+        $('#bookingForm').append(hiddenInputs);
 
-            const row = `
+        const row = `
         <tr>
             <td>${formData[0].value}</td>
             <td>${formData[1].value}</td>
@@ -484,46 +471,42 @@ if (isset($_POST['book'])) {
             </td>
         </tr>`;
 
-            $('#passengerTable tbody').append(row);
+        $('#passengerTable tbody').append(row);
 
-            const currentTotalFare = parseFloat($('#totalFare').text().replace('Total: ', '')) || 0;
-            const newTotalFare = currentTotalFare + parseFloat(accommodationFare);
-            $('#totalFare').text(`Total: ${newTotalFare.toFixed(2)}`);
+        const currentTotalFare = parseFloat($('#totalFare').text().replace('Total: ', '')) || 0;
+        const newTotalFare = currentTotalFare + parseFloat(accommodationFare);
+        $('#totalFare').text(`Total: ${newTotalFare.toFixed(2)}`);
 
-            updatePassengerCount();
-            $('#passengerModal').modal('hide');
-        });
+        updatePassengerCount();
+        $('#passengerModal').modal('hide');
+    });
 
-        $('#passengerTable').on('click', '.remove-btn', function() {
-            const row = $(this).closest('tr');
-            const fare = parseFloat(row.find('.fare-amount').val()) || 0;
+    $('#passengerTable').on('click', '.remove-btn', function() {
+        const row = $(this).closest('tr');
+        const fare = parseFloat(row.find('.fare-amount').val()) || 0;
 
-            row.remove();
+        row.remove();
 
-            const passengerIndex = row.index();
-            $('#bookingForm input[name="passenger_fname[]"]').eq(passengerIndex).remove();
-            $('#bookingForm input[name="passenger_mname[]"]').eq(passengerIndex).remove();
-            $('#bookingForm input[name="passenger_lname[]"]').eq(passengerIndex).remove();
-            $('#bookingForm input[name="passenger_bdate[]"]').eq(passengerIndex).remove();
-            $('#bookingForm input[name="passenger_contact[]"]').eq(passengerIndex).remove();
-            $('#bookingForm input[name="passenger_gender[]"]').eq(passengerIndex).remove();
-            $('#bookingForm input[name="passenger_type[]"]').eq(passengerIndex).remove();
-            $('#bookingForm input[name="passenger_address[]"]').eq(passengerIndex).remove();
-            $('#bookingForm input[name="fare[]"]').eq(passengerIndex).remove();
+        const passengerIndex = row.index();
+        $('#bookingForm input[name="passenger_fname[]"]').eq(passengerIndex).remove();
+        $('#bookingForm input[name="passenger_mname[]"]').eq(passengerIndex).remove();
+        $('#bookingForm input[name="passenger_lname[]"]').eq(passengerIndex).remove();
+        $('#bookingForm input[name="passenger_bdate[]"]').eq(passengerIndex).remove();
+        $('#bookingForm input[name="passenger_contact[]"]').eq(passengerIndex).remove();
+        $('#bookingForm input[name="passenger_gender[]"]').eq(passengerIndex).remove();
+        $('#bookingForm input[name="passenger_type[]"]').eq(passengerIndex).remove();
+        $('#bookingForm input[name="passenger_address[]"]').eq(passengerIndex).remove();
+        $('#bookingForm input[name="fare[]"]').eq(passengerIndex).remove();
 
-            const currentTotalFare = parseFloat($('#totalFare').text().replace('Total: ', '')) || 0;
-            const newTotalFare = currentTotalFare - fare;
-            $('#totalFare').text(`Total: ${newTotalFare.toFixed(2)}`);
-            updatePassengerCount();
-        });
+        const currentTotalFare = parseFloat($('#totalFare').text().replace('Total: ', '')) || 0;
+        const newTotalFare = currentTotalFare - fare;
+        $('#totalFare').text(`Total: ${newTotalFare.toFixed(2)}`);
+        updatePassengerCount();
+    });
 
-        function updatePassengerCount() {
-            const rowCount = $('#passengerTable tbody tr').length;
-            $('#count-passenger').text(rowCount);
-        }
-    </script>
-
-
-</body>
-
-</html>
+    function updatePassengerCount() {
+        const rowCount = $('#passengerTable tbody tr').length;
+        $('#count-passenger').text(rowCount);
+    }
+</script>
+<?php include 'footer.php' ?>

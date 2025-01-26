@@ -6,6 +6,38 @@ $admin_id = $_SESSION['admin_id'];
 if (!isset($admin_id)) {
     header('location:admin_login.php');
 }
+
+$ticketQuery = "
+    SELECT t.ticket_code, SUM(t.ticket_price) AS total_ticket_price, 
+           t.ticket_status, t.ticket_date, t.contact_person, t.contact_number, 
+           t.contact_email, t.contact_address,
+           r1.route_from AS route_from_id, r2.route_to AS route_to_id,
+           p1.port_name AS route_from, p2.port_name AS route_to,
+           sh.ship_name,
+           GROUP_CONCAT(p.passenger_fname, ' ', p.passenger_lname ORDER BY p.passenger_fname SEPARATOR ', ') AS passengers_names,
+           GROUP_CONCAT(p.passenger_contact ORDER BY p.passenger_fname SEPARATOR ', ') AS passengers_contacts,
+           GROUP_CONCAT(p.passenger_type ORDER BY p.passenger_fname SEPARATOR ', ') AS passengers_types,
+           GROUP_CONCAT(p.passenger_gender ORDER BY p.passenger_fname SEPARATOR ', ') AS passengers_genders
+    FROM tickets t
+    JOIN schedules s ON t.schedule_id = s.schedule_id
+    JOIN ships sh ON s.ship_id = sh.ship_id
+    JOIN routes r1 ON s.route_id = r1.route_id
+    JOIN routes r2 ON s.route_id = r2.route_id
+    JOIN ports p1 ON r1.route_from = p1.port_id
+    JOIN ports p2 ON r2.route_to = p2.port_id
+    LEFT JOIN passengers p ON t.ticket_id = p.ticket_id
+    GROUP BY t.ticket_code, t.ticket_status, t.ticket_date, t.contact_person, 
+             t.contact_number, t.contact_email, t.contact_address, 
+             r1.route_from, r2.route_to, p1.port_name, p2.port_name, 
+             sh.ship_name
+";
+
+
+
+$stmt = $conn->prepare($ticketQuery);
+$stmt->execute();
+$tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 <?php include 'header.php' ?>
 
@@ -16,8 +48,8 @@ if (!isset($admin_id)) {
     <!-- DataTales Example -->
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">Adult Tickets</h6>
-            <a class="btn btn-secondary" data-toggle="modal" data-target="#addTicket"> Add New Ticket </a>
+            <h6 class="m-0 font-weight-bold text-primary">Tickets</h6>
+            <a class="btn btn-secondary" href="select_schedules.php"> Add New Ticket </a>
         </div>
 
         <div class="card-body">
@@ -26,8 +58,7 @@ if (!isset($admin_id)) {
                     <thead>
                         <tr>
                             <th>#</th>
-                            <!-- <th>Ticket No.</th> -->
-                            <th>Schedule Date/Time</th>
+                            <th>Schedule Date</th>
                             <th>Name</th>
                             <th>Ship</th>
                             <th>From</th>
@@ -39,7 +70,22 @@ if (!isset($admin_id)) {
                         </tr>
                     </thead>
                     <tbody>
-
+                        <?php foreach ($tickets as $index => $ticket): ?>
+                            <tr>
+                                <td><?= $index + 1 ?></td>
+                                <td><?= htmlspecialchars($ticket['ticket_date']) ?></td>
+                                <td><?= htmlspecialchars($ticket['contact_person']) ?></td>
+                                <td><?= htmlspecialchars($ticket['ship_name']) ?></td>
+                                <td><?= htmlspecialchars($ticket['route_from']) ?></td>
+                                <td><?= htmlspecialchars($ticket['route_to']) ?></td>
+                                <td><?= htmlspecialchars($ticket['total_ticket_price']) ?></td>
+                                <td><?= htmlspecialchars($ticket['ticket_status']) ?></td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm view-passengers"
+                                        data-ticket-code="<?= htmlspecialchars($ticket['ticket_code']) ?>">View Passengers</button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
@@ -49,172 +95,6 @@ if (!isset($admin_id)) {
 
 
 </div>
-<!-- /.container-fluid -->
-
-
-
-<!-- Add Modal-->
-<div class="modal fade" id="addTicket" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Add New Ticket</h5>
-                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">
-
-                <form id="AddTicketForm" class="user" method="POST">
-
-
-                    <input type="hidden" name="ticket_type" value="Regular">
-                    <input type="hidden" name="passenger_type" value="Adult">
-                    <div class="row">
-                        <!-- Left-->
-                        <div class="col-xl-12 col-md-6 mb-4">
-
-
-                            <div class="form-group row">
-
-
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="exampleFormControlInput1">From</label>
-                                        <select class="form-control form-control-solid" id="route_from" name="route_from">
-                                            <?php foreach ($ports as $key => $value) : ?>
-                                                <option value="<?= $value->port_id; ?>"><?= $value->port_name; ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="exampleFormControlInput1">To</label>
-                                        <select class="form-control form-control-solid" id="route_to" name="route_to" required>
-                                        </select>
-
-                                    </div>
-                                </div>
-
-                            </div>
-
-
-                            <div class="form-group row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="exampleFormControlInput1">Ticket Date</label>
-                                        <input required class="form-control form-control-solid" type="date" id="ticket_date" name="ticket_date" onfocus="this.setAttribute('min', new Date().toISOString().split('T')[0])">
-                                    </div>
-                                </div>
-
-
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="exampleFormControlInput1">Schedule</label>
-                                        <select class="form-control form-control-solid" id="schedule_id" name="schedule_id">
-
-                                        </select>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            <h4>Passenger/s Details</h4>
-                            <hr class="border-light">
-                            <div class="mb-2 border-bottom p-item">
-
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="" class="control-laberl">First Name</label>
-                                            <input type="text" class="form-control form-control-sm rounded-0" name="passenger_fname[]" required>
-                                        </div>
-                                    </div>
-
-
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="" class="control-laberl">Middle Name</label>
-                                            <input type="text" class="form-control form-control-sm rounded-0" name="passenger_mname[]">
-                                        </div>
-                                    </div>
-
-
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="" class="control-laberl">Last Name</label>
-                                            <input type="text" class="form-control form-control-sm rounded-0" name="passenger_lname[]" required>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="" class="control-laberl">Birthdate</label>
-                                            <input type="date" class="form-control form-control-sm rounded-0" name="passenger_bdate[]" required>
-                                        </div>
-                                    </div>
-
-
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="" class="control-laberl">Contact</label>
-                                            <input type="text" class="form-control form-control-sm rounded-0" name="passenger_contact[]">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="" class="control-laberl">Gender</label>
-                                            <select class="form-control form-control-solid" id="passenger_gender" name="passenger_gender[]">
-                                                <option value="Male">Male</option>
-                                                <option value="Female">Female</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                                <div class="form-group row">
-                                    <div class="col-md-8">
-                                        <div class="form-group">
-
-                                            <label for="" class="control-laberl">Address</label>
-                                            <textarea rows="3" class="form-control form-control-sm rounded-0" name="passenger_address[]" required></textarea>
-                                        </div>
-                                    </div>
-
-
-                                    <div class="col-md-4 mt-5">
-                                        <div class="form-group">
-                                            <button class="btn btn-danger btn-sm btn-flat rem_item" type="button" onclick="rem_item($(this))"><i class="fa fa-trash"></i> Remove</button>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                            </div>
-                            <div class="w-100 d-flex justify-content-center py-1">
-                                <button class="btn btn-primary btn-sm btn-flat" type="button" id="add_passenger">Add Passenger</button>
-                            </div>
-
-
-                        </div>
-                    </div>
-
-
-                    <button class="btn btn-primary" type="submit">Add Ticket</button>
-            </div>
-
-            </form>
-        </div>
-    </div>
-</div>
-
 
 <!-- View Passenger Modal-->
 <div class="modal fade" id="viewPassenger" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"

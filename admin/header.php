@@ -130,12 +130,8 @@ $systeminfo_icon = $system_info['systeminfo_icon'] ? $system_info['systeminfo_ic
                 </a>
                 <div id="collapseTickets" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="ticket_free.php" id="ticket-free">Free</a>
-                        <a class="collapse-item" href="ticket_regular.php" id="ticket-regular">Regular</a>
-                        <a class="collapse-item" href="ticket_children.php" id="ticket-children">Children</a>
-                        <a class="collapse-item" href="ticket_student.php" id="ticket-student">Student</a>
-                        <a class="collapse-item" href="ticket_senior.php" id="ticket-senior">Senior</a>
-                        <a class="collapse-item" href="ticket_cargo.php" id="ticket-cargo">Cargo</a>
+                        <a class="collapse-item" href="ticket_regular.php" id="ticket-regular">Passengers Ticket</a>
+                        <a class="collapse-item" href="ticket_cargo.php" id="ticket-cargo">Cargo Ticket</a>
                     </div>
                 </div>
             </li>

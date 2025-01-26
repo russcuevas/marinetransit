@@ -108,22 +108,24 @@ if (isset($_POST['book'])) {
             $stmt->bindParam(':gender', $gender);
             $stmt->execute();
 
-            $qr_image_path = 'qr_codes/' . $ticket_code . '.png';
+            $qr_image_directory = 'qr_codes/'; // Directory for storing QR codes
+            $qr_image_filename = $ticket_code . '.png'; // Only the filename
+            $qr_image_path = $qr_image_directory . $qr_image_filename; // Full path for file creation
 
             if (!file_exists($qr_image_path)) {
-                if (!file_exists('qr_codes/')) {
-                    mkdir('qr_codes/', 0777, true);
+                if (!file_exists($qr_image_directory)) {
+                    mkdir($qr_image_directory, 0777, true);
                 }
                 $qr_content = "http://localhost/marinetransit/details.php?ticket_code=" . $ticket_code . "&passenger_id=" . $conn->lastInsertId();
                 QRcode::png($qr_content, $qr_image_path);
 
                 $updateTicketQuery = "
-                UPDATE tickets 
-                SET qr_code = :qr_code 
-                WHERE ticket_code = :ticket_code
-            ";
+        UPDATE tickets 
+        SET qr_code = :qr_code 
+        WHERE ticket_code = :ticket_code
+    ";
                 $stmt = $conn->prepare($updateTicketQuery);
-                $stmt->bindParam(':qr_code', $qr_image_path);
+                $stmt->bindParam(':qr_code', $qr_image_filename); // Save only the filename
                 $stmt->bindParam(':ticket_code', $ticket_code);
                 $stmt->execute();
             }
