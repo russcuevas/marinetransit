@@ -1,3 +1,24 @@
+<?php
+session_start();
+include 'connection/database.php';
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['send-ratings'])) {
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $message = $_POST['message'];
+
+    $insert_query = "INSERT INTO ratings (name, email, message) VALUES (?, ?, ?)";
+    $stmt = $conn->prepare($insert_query);
+    if ($stmt->execute([$name, $email, $message])) {
+        $_SESSION['success'] = 'Ratings added successfully!';
+        header('Location: contactus.php');
+        exit;
+    } else {
+        $_SESSION['error'] = 'Error adding ratings.';
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -26,6 +47,7 @@
     <link rel="stylesheet" href="css/flaticon.css">
     <link rel="stylesheet" href="css/icomoon.css">
     <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -81,20 +103,20 @@
             </div>
             <div class="row block-9">
                 <div class="col-md-6 order-md-last d-flex">
-                    <form action="#" class="bg-white p-5 contact-form">
+                    <form action="#" method="POST" class="bg-white p-5 contact-form">
                         <h1>Rate us</h1>
                         <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Your Name">
+                            <input type="text" class="form-control" name="name" placeholder="Your Name">
                         </div>
                         <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Your Email">
+                            <input type="text" class="form-control" name="email" placeholder="Your Email">
                         </div>
                         <div class="form-group">
-                            <textarea name="" id="" cols="30" rows="7" class="form-control"
+                            <textarea name="message" id="" cols="30" rows="7" class="form-control"
                                 placeholder="Message"></textarea>
                         </div>
                         <div class="form-group">
-                            <input type="submit" value="Send Message" class="btn btn-primary py-3 px-5">
+                            <input type="submit" name="send-ratings" value="Send Message" class="btn btn-primary py-3 px-5">
                         </div>
                     </form>
 
@@ -137,6 +159,30 @@
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
     <script src="js/google-map.js"></script>
     <script src="js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            <?php if (isset($_SESSION['success'])): ?>
+                Swal.fire({
+                    title: 'Success!',
+                    text: '<?php echo $_SESSION['success']; ?>',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                })
+                <?php unset($_SESSION['success']); ?>
+            <?php endif; ?>
+
+            <?php if (isset($_SESSION['error'])): ?>
+                Swal.fire({
+                    title: 'Error!',
+                    text: '<?php echo $_SESSION['error']; ?>',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                })
+                <?php unset($_SESSION['error']); ?>
+            <?php endif; ?>
+        });
+    </script>
 
 </body>
 

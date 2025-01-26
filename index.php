@@ -1,3 +1,10 @@
+<?php
+include 'connection/database.php';
+// Fetch ratings data
+$ratings_query = "SELECT * FROM ratings WHERE status = '1'";
+$ratings_stmt = $conn->query($ratings_query);
+$ratings = $ratings_stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -191,71 +198,21 @@
                             <h2 class="mb-0">Happy Customer</h2>
                         </div>
                         <div class="carousel-testimony owl-carousel ftco-animate">
-                            <div class="item">
-                                <div class="testimony-wrap pb-4">
-                                    <div class="text">
-                                        <p class="mb-4">A small river named Duden flows by their place and supplies it
-                                            with the necessary regelialia. It is a paradisematic country, in which
-                                            roasted parts of sentences fly into your mouth.</p>
-                                    </div>
-                                    <div class="d-flex">
-                                        <div class="pos ml-3">
-                                            <p class="name">Russel Vincent C. Cuevas</p>
+                            <?php foreach ($ratings as $rating): ?>
+                                <div class="item">
+                                    <div class="testimony-wrap pb-4">
+                                        <div class="text">
+                                            <p class="mb-4"><?php echo $rating['message'] ?></p>
+                                        </div>
+                                        <div class="d-flex">
+                                            <div class="pos ml-3">
+                                                <p class="name"><?php echo $rating['name'] ?></p>
+                                                <span class="position"><?php echo $rating['email'] ?></span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="item">
-                                <div class="testimony-wrap pb-4">
-                                    <div class="text">
-                                        <p class="mb-4">A small river named Duden flows by their place and supplies it
-                                            with the necessary regelialia. It is a paradisematic country, in which
-                                            roasted parts of sentences fly into your mouth.</p>
-                                    </div>
-                                    <div class="d-flex">
-                                        <div class="user-img" style="background-image: url(images/person_2.jpg)">
-                                        </div>
-                                        <div class="pos ml-3">
-                                            <p class="name">Gerald Hodson</p>
-                                            <span class="position">Businessman</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="item">
-                                <div class="testimony-wrap pb-4">
-                                    <div class="text">
-                                        <p class="mb-4">A small river named Duden flows by their place and supplies it
-                                            with the necessary regelialia. It is a paradisematic country, in which
-                                            roasted parts of sentences fly into your mouth.</p>
-                                    </div>
-                                    <div class="d-flex">
-                                        <div class="user-img" style="background-image: url(images/person_3.jpg)">
-                                        </div>
-                                        <div class="pos ml-3">
-                                            <p class="name">Gerald Hodson</p>
-                                            <span class="position">Businessman</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="item">
-                                <div class="testimony-wrap pb-4">
-                                    <div class="text">
-                                        <p class="mb-4">A small river named Duden flows by their place and supplies it
-                                            with the necessary regelialia. It is a paradisematic country, in which
-                                            roasted parts of sentences fly into your mouth.</p>
-                                    </div>
-                                    <div class="d-flex">
-                                        <div class="user-img" style="background-image: url(images/person_4.jpg)">
-                                        </div>
-                                        <div class="pos ml-3">
-                                            <p class="name">Gerald Hodson</p>
-                                            <span class="position">Businessman</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <?php endforeach ?>
                         </div>
                     </div>
                 </div>
