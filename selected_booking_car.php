@@ -116,7 +116,37 @@ if (isset($_POST['book'])) {
         }
     }
 
-    echo "Booking successful! QR Codes generated and saved to the database.";
+    if (!empty($_POST['passenger_cargo_brand']) && !empty($_POST['passenger_cargo_plate'])) {
+        foreach ($_POST['passenger_cargo_brand'] as $index => $cargo_brand) {
+            if (!empty($_POST['accomodation_id'][$index])) {
+                $accomodation_id = $_POST['accomodation_id'][$index];
+                $cargo_plate = $_POST['passenger_cargo_plate'][$index];
+                $insertCargoQuery = "
+                INSERT INTO passenger_cargos (ticket_id, accomodation_id, passenger_cargo_brand, passenger_cargo_plate)
+                VALUES (:ticket_id, :accomodation_id, :cargo_brand, :cargo_plate)
+            ";
+                $stmt = $conn->prepare($insertCargoQuery);
+                $stmt->bindParam(':ticket_id', $ticket_id);
+                $stmt->bindParam(':accomodation_id', $accomodation_id);
+                $stmt->bindParam(':cargo_brand', $cargo_brand, PDO::PARAM_NULL);
+                $stmt->bindParam(':cargo_plate', $cargo_plate, PDO::PARAM_NULL);
+                $stmt->execute();
+            }
+        }
+    } else {
+        if (!empty($_POST['accomodation_id'])) {
+            $insertCargoQuery = "
+            INSERT INTO passenger_cargos (ticket_id, accomodation_id, passenger_cargo_brand, passenger_cargo_plate)
+            VALUES (:ticket_id, :accomodation_id, NULL, NULL)
+        ";
+            $stmt = $conn->prepare($insertCargoQuery);
+            $stmt->bindParam(':ticket_id', $ticket_id);
+            $stmt->bindParam(':accomodation_id', $_POST['accomodation_id'][0]);
+            $stmt->execute();
+        }
+    }
+
+    echo "Booking successful!";
 }
 
 ?>
@@ -314,13 +344,6 @@ if (isset($_POST['book'])) {
     let selectedAccommodationId = null;
     let accommodationFare = 0;
 
-    function setModalTitle(accommodationName, accommodationId, fare) {
-        document.getElementById('passengerModalLabel').innerText = 'Passenger for ' + accommodationName;
-        document.getElementById('passenger_type').value = accommodationName;
-        selectedAccommodationId = accommodationId;
-        accommodationFare = fare;
-    }
-
     $('#passengerForm').on('submit', function(e) {
         e.preventDefault();
 
@@ -335,7 +358,6 @@ if (isset($_POST['book'])) {
         <input type="hidden" name="passenger_gender[]" value="${formData[5].value}">
         <input type="hidden" name="passenger_type[]" value="${formData[6].value}">
         <input type="hidden" name="passenger_address[]" value="${formData[7].value}">
-        <input type="hidden" name="fare[]" value="${accommodationFare}">
     `;
 
         $('#bookingForm').append(hiddenInputs);

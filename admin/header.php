@@ -94,6 +94,13 @@ $systeminfo_icon = $system_info['systeminfo_icon'] ? $system_info['systeminfo_ic
                 </a>
             </li>
 
+            <li class="nav-item" id="nav-rating">
+                <a class="nav-link" href="ratings.php">
+                    <i class="fas fa-fw fa-star"></i>
+                    <span>Ratings</span>
+                </a>
+            </li>
+
             <li class="nav-item" id="nav-schedule">
                 <a class="nav-link" href="schedule.php">
                     <i class="fas fa-fw fa-calendar"></i>
@@ -118,7 +125,7 @@ $systeminfo_icon = $system_info['systeminfo_icon'] ? $system_info['systeminfo_ic
             <!-- Tickets Collapse -->
             <li class="nav-item" id="nav-tickets">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTickets" aria-expanded="false" aria-controls="collapseTickets">
-                    <i class="fa fa-file"></i>
+                    <i class="fa fa-fw fa-file"></i>
                     <span>Tickets</span>
                 </a>
                 <div id="collapseTickets" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
@@ -242,6 +249,11 @@ $systeminfo_icon = $system_info['systeminfo_icon'] ? $system_info['systeminfo_ic
                     if (currentURL.includes('dashboard.php')) {
                         setActiveLink('nav-dashboard');
                     }
+
+                    if (currentURL.includes('ratings.php')) {
+                        setActiveLink('nav-rating');
+                    }
+
                     if (currentURL.includes('schedule.php')) {
                         setActiveLink('nav-schedule');
                     }
