@@ -33,6 +33,8 @@ $query_ports = "SELECT * FROM ports";
 $stmt_ports = $conn->prepare($query_ports);
 $stmt_ports->execute();
 $ports = $stmt_ports->fetchAll(PDO::FETCH_ASSOC);
+
+$current_time = date('H:i:s');
 ?>
 
 <!DOCTYPE html>

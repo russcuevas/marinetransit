@@ -106,14 +106,14 @@ if (isset($_GET['ticket_code'])) {
                 <?php echo $error_message; ?>
             </div>
         <?php else: ?>
-            <h2 class="text-left mb-4"> <img src="images/bg/ssr.jpeg" alt="Ticket Image" class="img-fluid">
-                TICKET DETAILS
+            <h2 class="text-left mb-4"> <img src="images/bg/ssr.jpeg" alt="Ticket Image" class="img-fluid"><br>
+                <?php echo $ticket['ticket_code']; ?>
             </h2>
 
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Route Details</h5>
-                    <table class="table table-bordered">
+                    <table class="table table-striped">
                         <tr>
                             <th>Route</th>
                             <td><?php echo $ticket['route_from']; ?> to <?php echo $ticket['route_to']; ?></td>

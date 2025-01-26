@@ -91,8 +91,8 @@ $cargos = $cargo_stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <td><?php echo htmlspecialchars($ticket['route_to']); ?></td>
                                 <td><?php echo htmlspecialchars($ticket['ticket_status']); ?></td>
                                 <td>
-                                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#viewPassenger" data-ticket-code="<?php echo htmlspecialchars($ticket['ticket_code']); ?>">
-                                        View Passengers
+                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#viewPassenger" data-ticket-code="<?php echo htmlspecialchars($ticket['ticket_code']); ?>">
+                                        View
                                     </button>
                                 </td>
                             </tr>

@@ -14,18 +14,26 @@ $get_report = "
         r.ticket_status,
         s.schedule_time,
         sh.ship_name,
-        r.ticket_price
+        r.ticket_price,
+        rt1.port_name AS route_from, 
+        rt2.port_name AS route_to
     FROM 
         reports r
     LEFT JOIN 
         schedules s ON r.schedule_id = s.schedule_id
     LEFT JOIN 
         ships sh ON s.ship_id = sh.ship_id
-    WHERE 1=1";
-
-$get_report .= " AND DATE(r.report_date) = :currentDate";
-
-$get_report .= " GROUP BY r.ticket_code";
+    LEFT JOIN 
+        routes r1 ON s.route_id = r1.route_id
+    LEFT JOIN 
+        routes r2 ON s.route_id = r2.route_id
+    LEFT JOIN 
+        ports rt1 ON r1.route_from = rt1.port_id
+    LEFT JOIN 
+        ports rt2 ON r2.route_to = rt2.port_id
+    WHERE 1=1
+    AND DATE(r.report_date) = :currentDate
+    GROUP BY r.ticket_code";
 
 $stmt_get_report = $conn->prepare($get_report);
 $stmt_get_report->bindValue(':currentDate', $currentDate);
@@ -129,8 +137,8 @@ $totalPrice = $total_price_result['total_ticket_price'];
                         <td><?= htmlspecialchars($reports['contact_person']); ?></td>
                         <td><?= htmlspecialchars($reports['schedule_time']); ?></td>
                         <td><?= htmlspecialchars($reports['ship_name']); ?></td>
-                        <td><?= htmlspecialchars($reports['contact_address']); ?></td>
-                        <td><?= htmlspecialchars($reports['contact_email']); ?></td>
+                        <td><?= htmlspecialchars($reports['route_from']); ?></td> <!-- Display route_from -->
+                        <td><?= htmlspecialchars($reports['route_to']); ?></td> <!-- Display route_to -->
                         <td><?= htmlspecialchars($reports['ticket_status']); ?></td>
                     </tr>
                 <?php endforeach ?>

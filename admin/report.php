@@ -17,8 +17,8 @@ $get_report = "
         r.ticket_code,
         MIN(r.report_id) AS report_id, -- Choose the lowest report_id for uniqueness
         r.contact_person,
-        r.contact_address,
-        r.contact_email,
+        p1.port_name AS route_from,    -- Get port_name for route_from
+        p2.port_name AS route_to,      -- Get port_name for route_to
         r.ticket_status,
         s.schedule_time,
         sh.ship_name 
@@ -28,6 +28,12 @@ $get_report = "
         schedules s ON r.schedule_id = s.schedule_id
     LEFT JOIN 
         ships sh ON s.ship_id = sh.ship_id
+    LEFT JOIN
+        routes ro ON s.route_id = ro.route_id  -- Join routes to get route_id
+    LEFT JOIN
+        ports p1 ON ro.route_from = p1.port_id  -- Join ports to get route_from (port_name)
+    LEFT JOIN
+        ports p2 ON ro.route_to = p2.port_id    -- Join ports to get route_to (port_name)
     WHERE 1=1";
 
 if ($dateFrom) {
@@ -98,8 +104,8 @@ $report = $stmt_get_report->fetchAll(PDO::FETCH_ASSOC);
                                 <td><?= htmlspecialchars($reports['contact_person']); ?></td>
                                 <td><?= htmlspecialchars($reports['schedule_time']); ?></td>
                                 <td><?= htmlspecialchars($reports['ship_name']); ?></td>
-                                <td><?= htmlspecialchars($reports['contact_address']); ?></td>
-                                <td><?= htmlspecialchars($reports['contact_email']); ?></td>
+                                <td><?= htmlspecialchars($reports['route_from']); ?></td> <!-- Display port_name for route_from -->
+                                <td><?= htmlspecialchars($reports['route_to']); ?></td> <!-- Display port_name for route_to -->
                                 <td><?= htmlspecialchars($reports['ticket_status']); ?></td>
                             </tr>
                         <?php endforeach ?>

@@ -84,7 +84,7 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <td><?= htmlspecialchars($ticket['ticket_status']) ?></td>
                                 <td>
                                     <button class="btn btn-primary btn-sm view-passengers"
-                                        data-ticket-code="<?= htmlspecialchars($ticket['ticket_code']) ?>">View Passengers</button>
+                                        data-ticket-code="<?= htmlspecialchars($ticket['ticket_code']) ?>">View</button>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

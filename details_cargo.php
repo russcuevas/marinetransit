@@ -114,100 +114,119 @@ if (isset($_GET['ticket_code'])) {
     </nav>
 
     <div class="container mt-5">
-        <h2>Cargo and Passenger Details</h2>
+        <h2 class="text-left mb-4"> <img src="images/bg/ssr.jpeg" alt="Ticket Image" class="img-fluid"><br>
+            <?php echo $ticket['ticket_code']; ?>
+        </h2>
 
         <?php if ($ticket) { ?>
-            <h4>Ticket Information</h4>
-            <table class="table table-striped">
-                <tr>
-                    <th>Ticket Code</th>
-                    <td><?php echo htmlspecialchars($ticket['ticket_code']); ?></td>
-                </tr>
-                <tr>
-                    <th>Ticket Date</th>
-                    <td><?php echo htmlspecialchars($ticket['ticket_date']); ?></td>
-                </tr>
-                <tr>
-                    <th>Status</th>
-                    <td><?php echo htmlspecialchars($ticket['ticket_status']); ?></td>
-                </tr>
-                <tr>
-                    <th>Ticket Price</th>
-                    <td><?php echo htmlspecialchars($ticket['ticket_price']); ?></td>
-                </tr>
-                <tr>
-                    <th>Ship Name</th>
-                    <td><?php echo htmlspecialchars($ticket['ship_name']); ?></td>
-                </tr>
-                <tr>
-                    <th>Route From</th>
-                    <td><?php echo htmlspecialchars($ticket['route_from']); ?></td>
-                </tr>
-                <tr>
-                    <th>Route To</th>
-                    <td><?php echo htmlspecialchars($ticket['route_to']); ?></td>
-                </tr>
-            </table>
-
-            <h4>Cargo Information</h4>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Passenger Cargo ID</th>
-                        <th>Accommodation Name</th>
-                        <th>Ship Name</th>
-                        <th>Ticket Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($cargos as $cargo) { ?>
+            <!-- Ticket Information Card -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h4>Ticket Information</h4>
+                    <table class="table table-striped">
                         <tr>
-                            <td><?php echo htmlspecialchars($cargo['passenger_cargo_id']); ?></td>
-                            <td><?php echo htmlspecialchars($cargo['accomodation_name']); ?></td>
-                            <td><?php echo htmlspecialchars($cargo['ship_name']); ?></td>
-                            <td><?php echo htmlspecialchars($cargo['ticket_date']); ?></td>
+                            <th>Ticket Code</th>
+                            <td><?php echo htmlspecialchars($ticket['ticket_code']); ?></td>
                         </tr>
-                    <?php } ?>
-                </tbody>
-            </table>
-
-            <h4>Passenger Information</h4>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>First Name</th>
-                        <th>Middle Name</th>
-                        <th>Last Name</th>
-                        <th>Birth Date</th>
-                        <th>Contact</th>
-                        <th>Address</th>
-                        <th>Type</th>
-                        <th>Gender</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($passengers as $passenger) { ?>
                         <tr>
-                            <td><?php echo htmlspecialchars($passenger['passenger_fname']); ?></td>
-                            <td><?php echo htmlspecialchars($passenger['passenger_mname']); ?></td>
-                            <td><?php echo htmlspecialchars($passenger['passenger_lname']); ?></td>
-                            <td><?php echo htmlspecialchars($passenger['passenger_bdate']); ?></td>
-                            <td><?php echo htmlspecialchars($passenger['passenger_contact']); ?></td>
-                            <td><?php echo htmlspecialchars($passenger['passenger_address']); ?></td>
-                            <td><?php echo htmlspecialchars($passenger['passenger_type']); ?></td>
-                            <td><?php echo htmlspecialchars($passenger['passenger_gender']); ?></td>
+                            <th>Ticket Date</th>
+                            <td><?php echo htmlspecialchars($ticket['ticket_date']); ?></td>
                         </tr>
-                    <?php } ?>
-                </tbody>
-            </table>
+                        <tr>
+                            <th>Status</th>
+                            <td><?php echo htmlspecialchars($ticket['ticket_status']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Ticket Price</th>
+                            <td><?php echo htmlspecialchars($ticket['ticket_price']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Ship Name</th>
+                            <td><?php echo htmlspecialchars($ticket['ship_name']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Route From</th>
+                            <td><?php echo htmlspecialchars($ticket['route_from']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Route To</th>
+                            <td><?php echo htmlspecialchars($ticket['route_to']); ?></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Cargo Information Card -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h4>Cargo Information</h4>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Vehicle</th>
+                                <th>Ship Name</th>
+                                <th>Ticket Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($cargos as $cargo) { ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($cargo['accomodation_name']); ?></td>
+                                    <td><?php echo htmlspecialchars($cargo['ship_name']); ?></td>
+                                    <td><?php echo htmlspecialchars($cargo['ticket_date']); ?></td>
+                                </tr>
+                            <?php } ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Passenger Information Card -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h4>Passenger Information</h4>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>First Name</th>
+                                <th>Middle Name</th>
+                                <th>Last Name</th>
+                                <th>Birth Date</th>
+                                <th>Contact</th>
+                                <th>Address</th>
+                                <th>Type</th>
+                                <th>Gender</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($passengers as $passenger) { ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($passenger['passenger_fname']); ?></td>
+                                    <td><?php echo htmlspecialchars($passenger['passenger_mname']); ?></td>
+                                    <td><?php echo htmlspecialchars($passenger['passenger_lname']); ?></td>
+                                    <td><?php echo htmlspecialchars($passenger['passenger_bdate']); ?></td>
+                                    <td><?php echo htmlspecialchars($passenger['passenger_contact']); ?></td>
+                                    <td><?php echo htmlspecialchars($passenger['passenger_address']); ?></td>
+                                    <td><?php echo htmlspecialchars($passenger['passenger_type']); ?></td>
+                                    <td><?php echo htmlspecialchars($passenger['passenger_gender']); ?></td>
+                                </tr>
+                            <?php } ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         <?php } else { ?>
             <p>No cargo or passenger details found for this ticket.</p>
         <?php } ?>
 
         <?php if ($error_message) { ?>
-            <p style="color: red;"><?php echo $error_message; ?></p>
+            <div class="alert alert-danger">
+                <p><?php echo $error_message; ?></p>
+            </div>
         <?php } ?>
     </div>
+
 
     <!-- loader -->
     <div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px">

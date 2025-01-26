@@ -14,15 +14,24 @@ $get_report = "
         r.ticket_status,
         s.schedule_time,
         sh.ship_name,
-        SUM(DISTINCT r.ticket_price) AS total_price -- Use SUM(DISTINCT) to sum unique ticket_price values
+        SUM(DISTINCT r.ticket_price) AS total_price,
+        rt1.port_name AS route_from, 
+        rt2.port_name AS route_to
     FROM 
         reports r
     LEFT JOIN 
         schedules s ON r.schedule_id = s.schedule_id
     LEFT JOIN 
         ships sh ON s.ship_id = sh.ship_id
+    LEFT JOIN 
+        routes r1 ON s.route_id = r1.route_id
+    LEFT JOIN 
+        routes r2 ON s.route_id = r2.route_id
+    LEFT JOIN 
+        ports rt1 ON r1.route_from = rt1.port_id
+    LEFT JOIN 
+        ports rt2 ON r2.route_to = rt2.port_id
     WHERE 1=1";
-
 
 if ($dateFrom) {
     $get_report .= " AND r.report_date >= :dateFrom";
@@ -41,6 +50,7 @@ if ($dateTo) {
 }
 $stmt_get_report->execute();
 $report = $stmt_get_report->fetchAll(PDO::FETCH_ASSOC);
+
 
 $totalPrice = 0;
 foreach ($report as $reports) {
@@ -112,8 +122,8 @@ foreach ($report as $reports) {
                     <td><?= htmlspecialchars($reports['contact_person']); ?></td>
                     <td><?= htmlspecialchars($reports['schedule_time']); ?></td>
                     <td><?= htmlspecialchars($reports['ship_name']); ?></td>
-                    <td><?= htmlspecialchars($reports['contact_address']); ?></td>
-                    <td><?= htmlspecialchars($reports['contact_email']); ?></td>
+                    <td><?= htmlspecialchars($reports['route_from']); ?></td> <!-- Display route_from -->
+                    <td><?= htmlspecialchars($reports['route_to']); ?></td> <!-- Display route_to -->
                     <td><?= htmlspecialchars($reports['ticket_status']); ?></td>
                 </tr>
             <?php endforeach ?>
