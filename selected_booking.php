@@ -6,7 +6,7 @@ if (isset($_GET['schedule_id']) && !empty($_GET['schedule_id'])) {
     $schedule_id = $_GET['schedule_id'];
 
     $query = "
-        SELECT s.schedule_id, sh.ship_name, s.schedule_time, p_from.port_name AS route_from, p_to.port_name AS route_to
+        SELECT s.schedule_id, sh.ship_name, s.schedule_date, s.schedule_time, p_from.port_name AS route_from, p_to.port_name AS route_to
         FROM schedules s
         JOIN ships sh ON s.ship_id = sh.ship_id
         JOIN routes r ON s.route_id = r.route_id
@@ -42,6 +42,7 @@ $stmt->execute();
 $accommodation_details = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 if (isset($_POST['book'])) {
+    $schedule_date = $_POST['ticket_date'];
     $ticket_code = uniqid('PASSENGER-');
     $ticket_date = date('Y-m-d H:i:s');
     $ticket_status = 'Pending';
@@ -67,7 +68,7 @@ if (isset($_POST['book'])) {
                 VALUES (:ticket_date, :ticket_code, :ticket_price, :ticket_type, :ticket_status, :schedule_id, :contact_person, :contact_number, :contact_email, :contact_address)
             ";
             $stmt = $conn->prepare($insertTicketQuery);
-            $stmt->bindParam(':ticket_date', $ticket_date);
+            $stmt->bindParam(':ticket_date', $schedule_date);
             $stmt->bindParam(':ticket_code', $ticket_code);
             $stmt->bindParam(':ticket_price', $ticket_price);
             $stmt->bindParam(':ticket_type', $accommodation_type);
@@ -201,7 +202,7 @@ if (isset($_POST['book'])) {
                             <div>
                                 <img src="images/bg/ssr.jpeg" alt="" class="img-fluid">
                                 <h6 class="my-0 mt-4" style="font-size: 19px;"><?php echo isset($schedule['route_from']) ? $schedule['route_from'] : 'N/A'; ?> -- <?php echo isset($schedule['route_to']) ? $schedule['route_to'] : 'N/A'; ?></h6>
-                                <h6 class="my-0" style="font-size: 19px;"><?php echo isset($schedule['schedule_time']) ? $schedule['schedule_time'] : 'N/A'; ?></h6>
+                                <h6 class="my-0" style="font-size: 19px;"><?php echo isset($schedule['schedule_date']) ? $schedule['schedule_date'] : 'N/A'; ?> / <?php echo isset($schedule['schedule_time']) ? $schedule['schedule_time'] : 'N/A'; ?></h6>
                                 <h6 class="my-0" style="font-size: 19px;"><?php echo isset($schedule['ship_name']) ? $schedule['ship_name'] : 'N/A'; ?></h6>
                             </div>
                         </li>
@@ -219,6 +220,7 @@ if (isset($_POST['book'])) {
                             </thead>
                             <tbody>
                                 <form class="needs-validation" method="POST" action="" id="bookingForm">
+                                    <input type="hidden" value="<?php echo isset($schedule['schedule_date']) ? $schedule['schedule_date'] : 'N/A'; ?>" name="ticket_date">
                                     <div id="passengerDataFields">
 
                                     </div>
