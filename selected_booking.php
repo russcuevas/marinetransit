@@ -2,7 +2,7 @@
 require_once('phpqrcode/qrlib.php');
 include 'connection/database.php';
 
-if (isset($_GET['schedule_id'])) {
+if (isset($_GET['schedule_id']) && !empty($_GET['schedule_id'])) {
     $schedule_id = $_GET['schedule_id'];
 
     $query = "
@@ -18,10 +18,17 @@ if (isset($_GET['schedule_id'])) {
     $stmt->bindParam(':schedule_id', $schedule_id);
     $stmt->execute();
     $schedule = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$schedule) {
+        header('Location: booknow.php');
+        exit;
+    }
 } else {
-    echo "No schedule selected.";
+    header('Location: booknow.php');
     exit;
 }
+
+
 $query = "
     SELECT sa.accomodation_id, a.accomodation_name, sa.net_fare
     FROM schedule_accom sa
@@ -43,78 +50,77 @@ if (isset($_POST['book'])) {
     $contact_email = $_POST['contact_email'];
     $contact_address = $_POST['contact_address'];
 
-    $all_passenger_details = "";
-    foreach ($_POST['passenger_fname'] as $index => $first_name) {
-        $last_name = $_POST['passenger_lname'][$index];
-        $middle_name = $_POST['passenger_mname'][$index];
-        $birthdate = $_POST['passenger_bdate'][$index];
-        $contact = $_POST['passenger_contact'][$index];
-        $address = $_POST['passenger_address'][$index];
-        $gender = $_POST['passenger_gender'][$index];
-        $accommodation_type = $_POST['passenger_type'][$index];
-        $accommodation_fare = $_POST['fare'][$index];
+    if (isset($_POST['passenger_fname']) && is_array($_POST['passenger_fname']) && !empty($_POST['passenger_fname'])) {
+        foreach ($_POST['passenger_fname'] as $index => $first_name) {
+            $last_name = $_POST['passenger_lname'][$index];
+            $middle_name = $_POST['passenger_mname'][$index];
+            $birthdate = $_POST['passenger_bdate'][$index];
+            $contact = $_POST['passenger_contact'][$index];
+            $address = $_POST['passenger_address'][$index];
+            $gender = $_POST['passenger_gender'][$index];
+            $accommodation_type = $_POST['passenger_type'][$index];
+            $accommodation_fare = $_POST['fare'][$index];
 
-        $ticket_price = $accommodation_fare;
-        $insertTicketQuery = "
-        INSERT INTO tickets (ticket_date, ticket_code, ticket_price, ticket_type, ticket_status, schedule_id, contact_person, contact_number, contact_email, contact_address)
-        VALUES (:ticket_date, :ticket_code, :ticket_price, :ticket_type, :ticket_status, :schedule_id, :contact_person, :contact_number, :contact_email, :contact_address)
-    ";
-        $stmt = $conn->prepare($insertTicketQuery);
-        $stmt->bindParam(':ticket_date', $ticket_date);
-        $stmt->bindParam(':ticket_code', $ticket_code);
-        $stmt->bindParam(':ticket_price', $ticket_price);
-        $stmt->bindParam(':ticket_type', $accommodation_type);
-        $stmt->bindParam(':ticket_status', $ticket_status);
-        $stmt->bindParam(':schedule_id', $schedule_id);
-        $stmt->bindParam(':contact_person', $contact_person);
-        $stmt->bindParam(':contact_number', $contact_number);
-        $stmt->bindParam(':contact_email', $contact_email);
-        $stmt->bindParam(':contact_address', $contact_address);
-        $stmt->execute();
+            $ticket_price = $accommodation_fare;
+            $insertTicketQuery = "
+                INSERT INTO tickets (ticket_date, ticket_code, ticket_price, ticket_type, ticket_status, schedule_id, contact_person, contact_number, contact_email, contact_address)
+                VALUES (:ticket_date, :ticket_code, :ticket_price, :ticket_type, :ticket_status, :schedule_id, :contact_person, :contact_number, :contact_email, :contact_address)
+            ";
+            $stmt = $conn->prepare($insertTicketQuery);
+            $stmt->bindParam(':ticket_date', $ticket_date);
+            $stmt->bindParam(':ticket_code', $ticket_code);
+            $stmt->bindParam(':ticket_price', $ticket_price);
+            $stmt->bindParam(':ticket_type', $accommodation_type);
+            $stmt->bindParam(':ticket_status', $ticket_status);
+            $stmt->bindParam(':schedule_id', $schedule_id);
+            $stmt->bindParam(':contact_person', $contact_person);
+            $stmt->bindParam(':contact_number', $contact_number);
+            $stmt->bindParam(':contact_email', $contact_email);
+            $stmt->bindParam(':contact_address', $contact_address);
+            $stmt->execute();
 
-        $ticket_id = $conn->lastInsertId();
-        $insertPassengerQuery = "
-        INSERT INTO passengers (ticket_id, passenger_fname, passenger_mname, passenger_lname, passenger_bdate, passenger_contact, passenger_address, passenger_type, passenger_gender)
-        VALUES (:ticket_id, :first_name, :middle_name, :last_name, :birthdate, :contact, :address, :passenger_type, :gender)
-    ";
-        $stmt = $conn->prepare($insertPassengerQuery);
-        $stmt->bindParam(':ticket_id', $ticket_id);
-        $stmt->bindParam(':first_name', $first_name);
-        $stmt->bindParam(':middle_name', $middle_name);
-        $stmt->bindParam(':last_name', $last_name);
-        $stmt->bindParam(':birthdate', $birthdate);
-        $stmt->bindParam(':contact', $contact);
-        $stmt->bindParam(':address', $address);
-        $stmt->bindParam(':passenger_type', $accommodation_type);
-        $stmt->bindParam(':gender', $gender);
-        $stmt->execute();
-        $all_passenger_details .= "Passenger: " . $first_name . " " . $middle_name . " " . $last_name . "\n" .
-            "Contact: " . $contact . "\n" .
-            "Email: " . $contact_email . "\n" .
-            "Fare: " . $accommodation_fare . "\n" .
-            "Accommodation: " . $accommodation_type . "\n\n";
-    }
+            $ticket_id = $conn->lastInsertId();
 
-    $qr_image_path = 'qr_codes/' . $ticket_code . '.png';
-
-    if (!file_exists($qr_image_path)) {
-        if (!file_exists('qr_codes/')) {
-            mkdir('qr_codes/', 0777, true);
+            $insertPassengerQuery = "
+                INSERT INTO passengers (ticket_id, passenger_fname, passenger_mname, passenger_lname, passenger_bdate, passenger_contact, passenger_address, passenger_type, passenger_gender)
+                VALUES (:ticket_id, :first_name, :middle_name, :last_name, :birthdate, :contact, :address, :passenger_type, :gender)
+            ";
+            $stmt = $conn->prepare($insertPassengerQuery);
+            $stmt->bindParam(':ticket_id', $ticket_id);
+            $stmt->bindParam(':first_name', $first_name);
+            $stmt->bindParam(':middle_name', $middle_name);
+            $stmt->bindParam(':last_name', $last_name);
+            $stmt->bindParam(':birthdate', $birthdate);
+            $stmt->bindParam(':contact', $contact);
+            $stmt->bindParam(':address', $address);
+            $stmt->bindParam(':passenger_type', $accommodation_type);
+            $stmt->bindParam(':gender', $gender);
+            $stmt->execute();
         }
-        QRcode::png("http://localhost/marinetransit/details.php?ticket_code=" . $ticket_code, $qr_image_path);
-        $updateTicketQuery = "
-        UPDATE tickets 
-        SET qr_code = :qr_code 
-        WHERE ticket_code = :ticket_code
-    ";
-        $stmt = $conn->prepare($updateTicketQuery);
-        $stmt->bindParam(':qr_code', $qr_image_path);
-        $stmt->bindParam(':ticket_code', $ticket_code);
-        $stmt->execute();
-    }
 
-    echo "Booking successful! QR Code generated.";
+        $qr_image_path = 'qr_codes/' . $ticket_code . '.png';
+
+        if (!file_exists($qr_image_path)) {
+            if (!file_exists('qr_codes/')) {
+                mkdir('qr_codes/', 0777, true);
+            }
+            QRcode::png("http://localhost/marinetransit/details.php?ticket_code=" . $ticket_code, $qr_image_path);
+            $updateTicketQuery = "
+                UPDATE tickets 
+                SET qr_code = :qr_code 
+                WHERE ticket_code = :ticket_code
+            ";
+            $stmt = $conn->prepare($updateTicketQuery);
+            $stmt->bindParam(':qr_code', $qr_image_path);
+            $stmt->bindParam(':ticket_code', $ticket_code);
+            $stmt->execute();
+        }
+        $_SESSION['success'] = 'Booking successfully!';
+    } else {
+        $_SESSION['error'] = 'Please add at least one passenger.';
+    }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -137,6 +143,8 @@ if (isset($_POST['book'])) {
     <link rel="stylesheet" href="css/flaticon.css">
     <link rel="stylesheet" href="css/icomoon.css">
     <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+
 </head>
 
 <body>
@@ -204,7 +212,7 @@ if (isset($_POST['book'])) {
                                 </tr>
                             </thead>
                             <tbody>
-                                <form class="needs-validation" method="POST" action="" novalidate id="bookingForm">
+                                <form class="needs-validation" method="POST" action="" id="bookingForm">
                                     <div id="passengerDataFields">
 
                                     </div>
@@ -400,6 +408,30 @@ if (isset($_POST['book'])) {
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
     <script src="js/google-map.js"></script>
     <script src="js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            <?php if (isset($_SESSION['success'])): ?>
+                Swal.fire({
+                    title: 'Success!',
+                    text: '<?php echo $_SESSION['success']; ?>',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                })
+                <?php unset($_SESSION['success']); ?>
+            <?php endif; ?>
+
+            <?php if (isset($_SESSION['error'])): ?>
+                Swal.fire({
+                    title: 'Error!',
+                    text: '<?php echo $_SESSION['error']; ?>',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                })
+                <?php unset($_SESSION['error']); ?>
+            <?php endif; ?>
+        });
+    </script>
     <script>
         let selectedAccommodationId = null;
         let accommodationFare = 0;
