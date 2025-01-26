@@ -1,61 +1,143 @@
-<?php
-include 'connection/database.php';
-?>
-<?php include 'header.php' ?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Marinetransit</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:200,300,400,600,700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/open-iconic-bootstrap.min.css">
+    <link rel="stylesheet" href="css/animate.css">
+
+    <link rel="stylesheet" href="css/owl.carousel.min.css">
+    <link rel="stylesheet" href="css/owl.theme.default.min.css">
+    <link rel="stylesheet" href="css/magnific-popup.css">
+
+    <link rel="stylesheet" href="css/aos.css">
+
+    <link rel="stylesheet" href="css/ionicons.min.css">
+
+    <link rel="stylesheet" href="css/bootstrap-datepicker.css">
+    <link rel="stylesheet" href="css/jquery.timepicker.css">
 
 
-<!-- Top content -->
-<div class="top-content" style="padding-bottom: 0px!important;">
-    <div class="container">
-        <div>
+    <link rel="stylesheet" href="css/flaticon.css">
+    <link rel="stylesheet" href="css/icomoon.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
 
-            <div class="col-sm-12" style=" background: #ffffff; backdrop-filter: blur(5px); border-radius: 15px; color: white!important; margin-bottom: 20px;">
+<body>
 
+    <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-dark "
+        style="background-color: #000957 !important;" id="ftco-navbar">
+        <div class="container">
+            <a class="navbar-brand" href="index.php"><img style="height: 50px; border-radius: 50px;"
+                    src="images/bg/icon.jpg" alt="">
+                Marine<span style="color: red;">transit</span></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav"
+                aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="oi oi-menu"></span> Menu
+            </button>
 
-                <div style="display: flex; justify-content: center; padding: 20px; gap: 20px; color: #0a57a2;">
-                    <h1 style="color:#0a57a2;"><strong><u><i>CONTACT US</i></u></strong></h1>
-                </div>
-
-
-
-                <div class="row">
-
-                    <div class="col-md-6">
-
-                        <img src="assets/user/img/width_800.jpeg" style="height: auto; width: 100%">
-
-                    </div>
-
-                    <div class="col-md-6" style="display: flex; flex-direction: column; align-content: space-between;">
-
-                        <div style="display: flex; justify-content: center; padding: 20px; gap: 20px; color: #0a57a2; align-items: center;">
-                            <img class="img-profile rounded-circle" src="assets/user/img/backgrounds/icon.jpg" style="height: 100px; width: auto; border-radius: 50%;">
-
-                            <h3 style="margin: 0; font-size: 30px!important;"><strong><i>Super Shuttle Ferry</i></strong></h3>
-                        </div>
-
-                        <div style="text-align: left; font-weight: bold;">
-
-                            <h3><strong><i>Information And Reservation</i></strong></h3>
-                            <br>
-                            <h3><strong><i>Text Or Call:</i></strong></h3>
-                            <h3><strong><i>Globe 09772385635</i></strong></h3>
-                            <h3><strong><i>Smart 09202939007</i></strong></h3>
-                        </div>
-                    </div>
-
-                </div>
-
-
-
-                <br>
-
+            <div class="collapse navbar-collapse" id="ftco-nav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item"><a href="index.php" class="nav-link">Home</a></li>
+                    <li class="nav-item"><a href="aboutus.php" class="nav-link">About</a></li>
+                    <li class="nav-item"><a href="inspiration.php" class="nav-link">Inspiration</a></li>
+                    <li class="nav-item active"><a href="contactus.php" class="nav-link">Contact Us</a></li>
+                    <li class="nav-item"><a href="policy.php" class="nav-link">Privacy Policy</a></li>
+                    <li class="nav-item"><a href="guidelines.php" class="nav-link">FAQ</a></li>
+                </ul>
             </div>
-
         </div>
+    </nav>
+    <!-- END nav -->
 
-    </div>
-</div>
+    <section class="ftco-section contact-section bg-light">
+        <div class="container">
+            <div class="row d-flex mb-5 contact-info">
+                <div class="col-md-12 mb-4">
+                    <h2 class="h3">Contact Us/Information</h2>
+                </div>
+                <div class="w-100"></div>
+                <div class="col-md-4 d-flex">
+                    <div class="info rounded bg-white p-4">
+                        <p><span>Address:</span> 198 West 21th Street, Suite 721 New York NY 10016</p>
+                    </div>
+                </div>
+                <div class="col-md-4 d-flex">
+                    <div class="info rounded bg-white p-4">
+                        <p><span>Phone:</span> <a href="tel://1234567920"><br>Smart 09202939007 <br> Globe 09772385635
+                            </a></p>
+                    </div>
+                </div>
+                <div class="col-md-4 d-flex">
+                    <div class="info rounded bg-white p-4">
+                        <p><span>Email:</span> <a href="mailto:info@yoursite.com">info@yoursite.com</a></p>
+                    </div>
+                </div>
+            </div>
+            <div class="row block-9">
+                <div class="col-md-6 order-md-last d-flex">
+                    <form action="#" class="bg-white p-5 contact-form">
+                        <h1>Rate us</h1>
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Your Name">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Your Email">
+                        </div>
+                        <div class="form-group">
+                            <textarea name="" id="" cols="30" rows="7" class="form-control"
+                                placeholder="Message"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" value="Send Message" class="btn btn-primary py-3 px-5">
+                        </div>
+                    </form>
+
+                </div>
+
+                <div class="col-md-6 d-flex">
+                    <div class="bg-white">
+                        <img style="height: 500px;" src="images/bg/width_800.jpeg" alt="">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
 
-<script src="assets/admin/vendor/jquery/jquery.min.js"></script>
+
+
+    <!-- loader -->
+    <div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px">
+            <circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee" />
+            <circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10"
+                stroke="#F96D00" />
+        </svg></div>
+
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquery-migrate-3.0.1.min.js"></script>
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery.easing.1.3.js"></script>
+    <script src="js/jquery.waypoints.min.js"></script>
+    <script src="js/jquery.stellar.min.js"></script>
+    <script src="js/owl.carousel.min.js"></script>
+    <script src="js/jquery.magnific-popup.min.js"></script>
+    <script src="js/aos.js"></script>
+    <script src="js/jquery.animateNumber.min.js"></script>
+    <script src="js/bootstrap-datepicker.js"></script>
+    <script src="js/scrollax.min.js"></script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
+    <script src="js/google-map.js"></script>
+    <script src="js/main.js"></script>
+
+</body>
+
+</html>

@@ -3,8 +3,6 @@ include 'connection/database.php';
 
 if (isset($_GET['ticket_code'])) {
     $ticket_code = $_GET['ticket_code'];
-
-    // Query to sum all ticket prices for the same ticket_code
     $ticketQuery = "
         SELECT t.ticket_code, SUM(t.ticket_price) AS total_ticket_price, 
                t.ticket_status, t.schedule_id, t.contact_person, t.contact_number, 
@@ -29,7 +27,6 @@ if (isset($_GET['ticket_code'])) {
     $ticket = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($ticket) {
-        // Fetch passenger details based on the ticket id
         $passengerQuery = "
             SELECT p.passenger_fname, p.passenger_mname, p.passenger_lname, p.passenger_bdate, 
                    p.passenger_contact, p.passenger_address, p.passenger_type, p.passenger_gender
