@@ -57,7 +57,7 @@ $route_count = $route_result['route_count'];
     <div class="row">
 
         <div class="col-xl-12 col-md-12 mb-0">
-            <p>Hi, System Administrator</p>
+            <p style="color: black;">Hi, System Administrator</p>
         </div>
     </div>
 

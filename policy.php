@@ -61,11 +61,12 @@
             <div class="table-responsive">
                 <table class="table table-bordered text-center">
                     <thead style="background-color: #000957 !important; color: white;">
+                        <h1 style="text-align: end;">CIRCUMSTANCES</h1>
                         <tr>
                             <th></th>
                             <th>Cancelled</th>
                             <th>Delayed</th>
-                            <th>Sample</th>
+                            <th>Unfinished Uncompleted</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -77,7 +78,7 @@
                             </td>
                             <td>✔</td>
                             <td>✔</td>
-                            <td></td>
+                            <td>✔</td>
                         </tr>
                         <tr>
                             <td style="text-align: left;"><strong>2. Refund</strong><br>
@@ -108,7 +109,7 @@
                             </td>
                             <td>✔</td>
                             <td>✔</td>
-                            <td></td>
+                            <td>✔</td>
                         </tr>
                         <tr>
                             <td style="text-align: left;"><strong>5. Compensation</strong><br>
@@ -117,17 +118,16 @@
                             </td>
                             <td>✔</td>
                             <td>✔</td>
-                            <td></td>
+                            <td>✔</td>
                         </tr>
                         <tr>
                             <td style="text-align: left;"><strong>6. Comparable Transport</strong><br>
-                                If the passenger does not want a refund, he/she may re-schedule the voyage on the same
-                                or
-                                alternative route, with no additional cost.
+                                Passengers must be transported through another ship of the same operator or through a comparable transport
+                                that will enable them to arrive at their destination.
                             </td>
-                            <td>✔</td>
-                            <td>✔</td>
                             <td></td>
+                            <td></td>
+                            <td>✔</td>
                         </tr>
                     </tbody>
                 </table>

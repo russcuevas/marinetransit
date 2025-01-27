@@ -42,6 +42,11 @@ $systeminfo_icon = $system_info['systeminfo_icon'] ? $system_info['systeminfo_ic
 
 
     <style type="text/css">
+        .navbar-nav .active span,
+        .navbar-nav .active i {
+            color: white !important;
+        }
+
         .navbar-nav span,
         .navbar-nav i {
             color: #000 !important;
@@ -49,7 +54,7 @@ $systeminfo_icon = $system_info['systeminfo_icon'] ? $system_info['systeminfo_ic
         }
 
         .active {
-            background: #1995ed;
+            background: #000957;
             color: black !important;
         }
 
@@ -69,9 +74,9 @@ $systeminfo_icon = $system_info['systeminfo_icon'] ? $system_info['systeminfo_ic
         <ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar" style="background: #d5d6d7; color: black!important;">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-start" href="admin" style="background: #afdaf9">
+            <a class="sidebar-brand d-flex align-items-center justify-content-start" href="admin" style="background: #000957 ">
                 <img class="img-profile rounded-circle" src="assets/system_image/<?php echo $systeminfo_icon; ?>" style="height: 50px; width: auto;">
-                <div class="sidebar-brand-text mx-3" style="color: black!important"><?php echo $systeminfo_shortname; ?></div>
+                <div class="sidebar-brand-text mx-3" style="color: white !important"><?php echo $systeminfo_shortname; ?></div>
             </a>
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
@@ -203,7 +208,7 @@ $systeminfo_icon = $system_info['systeminfo_icon'] ? $system_info['systeminfo_ic
             <div id="content">
 
                 <!-- Topbar -->
-                <nav class="navbar navbar-expand navbar-light topbar mb-4 static-top shadow" style="background: #afdaf9">
+                <nav class="navbar navbar-expand navbar-light topbar mb-4 static-top shadow" style="background: #000957 ">
 
                     <h3 class="text-white font-weight-bold"><?php echo $systeminfo_name; ?></h3>
 
@@ -212,11 +217,11 @@ $systeminfo_icon = $system_info['systeminfo_icon'] ? $system_info['systeminfo_ic
                 <!-- End of Topbar -->
 
                 <!-- Page Heading -->
-                <div class="d-sm-flex align-items-center justify-content-left p-2 mb-4" style="background: #afdaf9">
+                <div class="d-sm-flex align-items-center justify-content-left p-2 mb-4" style="background: #000957 ">
                     <img class="img-profile mx-2 rounded-circle" src="assets/admin/img/avatar2.png" style="height: 50px; width: auto;">
                     <div class="d-flex flex-column justify-content-center">
-                        <h1 class="h4 mb-0 text-gray-800">Administrator Dashboard</h1>
-                        <p>Melody Digdigan</p>
+                        <h1 class="h4 mb-0" style="color: white !important;">Administrator Dashboard</h1>
+                        <p style="color: white !important;">Melody Digdigan</p>
                     </div>
                 </div>
 

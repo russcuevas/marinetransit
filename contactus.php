@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['send-ratings'])) {
                 <div class="w-100"></div>
                 <div class="col-md-4 d-flex">
                     <div class="info rounded bg-white p-4">
-                        <p><span>Address:</span> 198 West 21th Street, Suite 721 New York NY 10016</p>
+                        <p><span>Address:</span> Asian Marine Tranport Corporation Camiguin Philippines </p>
                     </div>
                 </div>
                 <div class="col-md-4 d-flex">
@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['send-ratings'])) {
                 </div>
                 <div class="col-md-4 d-flex">
                     <div class="info rounded bg-white p-4">
-                        <p><span>Email:</span> <a href="mailto:info@yoursite.com">info@yoursite.com</a></p>
+                        <p><span>Email:</span> <a href="mailto:info@yoursite.com">supershuttleferry.com</a></p>
                     </div>
                 </div>
             </div>
