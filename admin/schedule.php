@@ -30,7 +30,7 @@ $accom_stmt->closeCursor();
 
 // Fetch schedule data
 $schedule_query = "
-SELECT s.schedule_id, s.schedule_time, sh.ship_id, sh.ship_name, r.route_id, p_from.port_name AS from_port, p_to.port_name AS to_port
+SELECT s.schedule_id, s.schedule_time, s.schedule_date, sh.ship_id, sh.ship_name, r.route_id, p_from.port_name AS from_port, p_to.port_name AS to_port
 FROM schedules s
 JOIN ships sh ON s.ship_id = sh.ship_id
 JOIN routes r ON s.route_id = r.route_id
@@ -100,6 +100,8 @@ if (isset($_GET['schedule_id'])) {
                     <thead>
                         <tr>
                             <th>#</th>
+                            <th>Schedule Date</th>
+
                             <th>Schedule Time</th>
                             <th>Ship</th>
                             <th>Route</th>
@@ -111,6 +113,8 @@ if (isset($_GET['schedule_id'])) {
                             <?php foreach ($schedules as $schedule): ?>
                                 <tr>
                                     <td><?php echo htmlspecialchars($schedule['schedule_id']); ?></td>
+                                    <td><?php echo htmlspecialchars($schedule['schedule_date']); ?></td>
+
                                     <td><?php echo htmlspecialchars($schedule['schedule_time']); ?></td>
                                     <td><?php echo htmlspecialchars($schedule['ship_name']); ?></td>
                                     <td><?php echo "From " . htmlspecialchars($schedule['from_port']) . " To " . htmlspecialchars($schedule['to_port']); ?></td>

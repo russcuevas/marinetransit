@@ -62,7 +62,7 @@ if (isset($_POST['book'])) {
     $contact_email = $_POST['contact_email'];
     $contact_address = $_POST['contact_address'];
 
-    $ticket_ids = []; // Array to store ticket ids for reports
+    $ticket_ids = [];
 
     if (isset($_POST['passenger_fname']) && is_array($_POST['passenger_fname']) && !empty($_POST['passenger_fname'])) {
         foreach ($_POST['passenger_fname'] as $index => $first_name) {
@@ -93,9 +93,7 @@ if (isset($_POST['book'])) {
             $stmt->bindParam(':contact_address', $contact_address);
             $stmt->execute();
 
-            $ticket_id = $conn->lastInsertId(); // Retrieve ticket id
-
-            // Store the ticket_id for reports insertion
+            $ticket_id = $conn->lastInsertId();
             $ticket_ids[] = $ticket_id;
 
             $insertPassengerQuery = "
@@ -103,7 +101,7 @@ if (isset($_POST['book'])) {
                 VALUES (:ticket_id, :first_name, :middle_name, :last_name, :birthdate, :contact, :address, :passenger_type, :gender)
             ";
             $stmt = $conn->prepare($insertPassengerQuery);
-            $stmt->bindParam(':ticket_id', $ticket_id); // Bind ticket_id for each passenger
+            $stmt->bindParam(':ticket_id', $ticket_id);
             $stmt->bindParam(':first_name', $first_name);
             $stmt->bindParam(':middle_name', $middle_name);
             $stmt->bindParam(':last_name', $last_name);
@@ -115,27 +113,22 @@ if (isset($_POST['book'])) {
             $stmt->execute();
         }
 
-        // Insert into the reports table for each ticket
         foreach ($ticket_ids as $ticket_id) {
-            // Retrieve ticket price and other details based on ticket_id
             $ticketQuery = "
         SELECT ticket_price, ticket_code FROM tickets WHERE ticket_id = :ticket_id
     ";
             $stmt = $conn->prepare($ticketQuery);
             $stmt->bindParam(':ticket_id', $ticket_id);
             $stmt->execute();
-            $ticketData = $stmt->fetch(PDO::FETCH_ASSOC);  // Fetch ticket details for this ticket_id
-
-            // Retrieve passenger types based on ticket_id
+            $ticketData = $stmt->fetch(PDO::FETCH_ASSOC);
             $passengerQuery = "
         SELECT passenger_type FROM passengers WHERE ticket_id = :ticket_id
     ";
             $stmt = $conn->prepare($passengerQuery);
             $stmt->bindParam(':ticket_id', $ticket_id);
             $stmt->execute();
-            $passenger_types = $stmt->fetchAll(PDO::FETCH_COLUMN); // Get all passenger types for this ticket
+            $passenger_types = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-            // Now insert reports for each passenger type under this ticket
             foreach ($passenger_types as $accommodation_type) {
                 $insertReportQuery = "
             INSERT INTO reports (

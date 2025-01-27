@@ -15,6 +15,7 @@ $query = "
         a.accomodation_type,
         s.schedule_id,
         s.schedule_time,
+        s.schedule_date, -- Add this line
         r_from.port_name AS route_from,
         r_to.port_name AS route_to
     FROM
@@ -32,6 +33,7 @@ $query = "
     WHERE
         a.accomodation_type = 'cargo'
 ";
+
 
 $stmt = $conn->prepare($query);
 $stmt->execute();
@@ -55,6 +57,7 @@ $schedules = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <thead>
                             <tr>
                                 <th>Car</th>
+                                <th>Schedule Date</th>
                                 <th>Schedule Time</th>
                                 <th>Routes</th>
                                 <th>Price</th>
@@ -65,6 +68,7 @@ $schedules = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <?php foreach ($schedules as $schedule): ?>
                                 <tr>
                                     <td><?php echo $schedule['accomodation_name']; ?></td>
+                                    <td><?php echo $schedule['schedule_date']; ?></td>
                                     <td>
                                         <?php
                                         $time = DateTime::createFromFormat('H:i:s', $schedule['schedule_time']);
