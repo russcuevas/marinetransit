@@ -10,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $route_from = $_POST['route_from'];
     $route_to = $_POST['route_to'];
     $accomodation_id = $_POST['accomodation_id'];
+    $schedule_date = $_POST['schedule_date'];
 
     $query = "
     SELECT
@@ -18,6 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         a.accomodation_name,
         a.accomodation_type,
         s.schedule_id,
+        s.schedule_date,
         s.schedule_time,
         r_from.port_name AS route_from,
         r_to.port_name AS route_to
@@ -37,15 +39,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         r_from.port_id = :route_from
         AND r_to.port_id = :route_to
         AND sa.accomodation_id = :accomodation_id
+        AND s.schedule_date = :schedule_date
     ";
 
     $stmt = $conn->prepare($query);
     $stmt->bindParam(':route_from', $route_from, PDO::PARAM_INT);
     $stmt->bindParam(':route_to', $route_to, PDO::PARAM_INT);
     $stmt->bindParam(':accomodation_id', $accomodation_id, PDO::PARAM_INT);
+    $stmt->bindParam(':schedule_date', $schedule_date, PDO::PARAM_STR);
     $stmt->execute();
     $schedules = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
 
 ?>
 
@@ -213,6 +218,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <thead>
                                 <tr>
                                     <th>Car</th>
+                                    <th>Schedule Date</th>
                                     <th>Schedule Time</th>
                                     <th>Routes</th>
                                     <th>Price</th>
@@ -223,6 +229,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <?php foreach ($schedules as $schedule): ?>
                                     <tr>
                                         <td><?php echo $schedule['accomodation_name']; ?></td>
+                                        <td><?php echo $schedule['schedule_date']; ?></td>
                                         <td>
                                             <?php
                                             $time = DateTime::createFromFormat('H:i:s', $schedule['schedule_time']);
@@ -249,6 +256,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     </div>
                 </div>
             <?php endif; ?>
+
 
         </div>
     </div>

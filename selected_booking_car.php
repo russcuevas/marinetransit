@@ -15,6 +15,7 @@ if (isset($_GET['schedule_accom_id']) && !empty($_GET['schedule_accom_id'])) {
         a.accomodation_type,
         s.schedule_id,
         s.schedule_time,
+        s.schedule_date, -- Add this line to include schedule_date
         r_from.port_name AS route_from,
         r_to.port_name AS route_to
     FROM
@@ -31,7 +32,8 @@ if (isset($_GET['schedule_accom_id']) && !empty($_GET['schedule_accom_id'])) {
         ports r_to ON r.route_to = r_to.port_id
     WHERE
         sa.schedule_accom_id = :schedule_accom_id
-    ";
+";
+
 
     $stmt = $conn->prepare($query);
     $stmt->bindParam(':schedule_accom_id', $schedule_accom_id, PDO::PARAM_INT);
@@ -50,7 +52,7 @@ if (isset($_GET['schedule_accom_id']) && !empty($_GET['schedule_accom_id'])) {
 
 if (isset($_POST['book'])) {
     $ticket_code = uniqid('CARGO-');
-    $ticket_date = date('Y-m-d H:i:s');
+    $ticket_date = $_POST['ticket_date'];
     $ticket_status = 'Pending';
     $contact_person = $_POST['contact_person'];
     $contact_number = $_POST['contact_number'];
@@ -241,8 +243,7 @@ if (isset($_POST['book'])) {
                                 <h6 class="my-0 mt-4" style="font-size: 19px;"><?php echo $selected_schedule['route_from']; ?> ---- <?php echo $selected_schedule['route_to']; ?></h6>
                                 <h6 class="my-0" style="font-size: 19px;"><?php echo number_format($selected_schedule['net_fare'], 2); ?></h6>
                                 <h6 class="my-0" style="font-size: 19px;"><?php echo $selected_schedule['accomodation_name']; ?></h6>
-                                <h6 class="my-0" style="font-size: 19px;"><?php echo $selected_schedule['schedule_time']; ?></h6>
-
+                                <h6 class="my-0" style="font-size: 19px;"><?php echo isset($selected_schedule['schedule_date']) ? $selected_schedule['schedule_date'] : 'N/A'; ?> / <?php echo isset($selected_schedule['schedule_time']) ? $selected_schedule['schedule_time'] : 'N/A'; ?></h6>
                             </div>
                         </li>
 
@@ -253,6 +254,7 @@ if (isset($_POST['book'])) {
                         <input type="hidden" value="<?php echo $selected_schedule['schedule_id']; ?>" name="schedule_id">
                         <input type="hidden" value="<?php echo $selected_schedule['net_fare']; ?>" name="ticket_price">
                         <input type="hidden" value="<?php echo $selected_schedule['accomodation_id']; ?>" name="accomodation_id[]">
+                        <input type="hidden" value="<?php echo isset($selected_schedule['schedule_date']) ? $selected_schedule['schedule_date'] : 'N/A'; ?>" name="ticket_date">
                         <h4 class="mb-3">Contact Infromation</h4>
                         <div class="row">
                             <div class="col-md-6 mb-3">

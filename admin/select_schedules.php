@@ -8,7 +8,7 @@ if (!isset($admin_id)) {
 }
 
 $query = "
-    SELECT s.schedule_id, sh.ship_name, s.schedule_time, p_from.port_name AS route_from, p_to.port_name AS route_to
+    SELECT s.schedule_id, sh.ship_name, s.schedule_date, s.schedule_time, p_from.port_name AS route_from, p_to.port_name AS route_to
     FROM schedules s
     JOIN ships sh ON s.ship_id = sh.ship_id
     JOIN routes r ON s.route_id = r.route_id
@@ -37,6 +37,7 @@ $schedules = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <thead>
                             <tr>
                                 <th>Ship</th>
+                                <th>Date</th>
                                 <th>Time</th>
                                 <th>Routes</th>
                                 <th>Action</th>
@@ -46,6 +47,7 @@ $schedules = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <?php foreach ($schedules as $schedule): ?>
                                 <tr>
                                     <td><?php echo $schedule['ship_name']; ?></td>
+                                    <td><?php echo $schedule['schedule_date']; ?></td>
                                     <td>
                                         <?php
                                         $time = DateTime::createFromFormat('H:i:s', $schedule['schedule_time']);
