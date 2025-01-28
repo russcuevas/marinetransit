@@ -159,7 +159,7 @@ if (isset($_POST['book'])) {
         $mail->Body = $emailBody;
 
         if ($mail->send()) {
-            $_SESSION['success'] = 'Booking successful! Confirmation email sent.';
+            $_SESSION['success'] = 'Booking successful!';
         } else {
             $_SESSION['error'] = 'Booking successful, but email could not be sent.';
         }

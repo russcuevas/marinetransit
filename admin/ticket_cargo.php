@@ -93,9 +93,6 @@ $cargos = $cargo_stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td><?php echo htmlspecialchars($ticket['ticket_status']); ?></td>
                                     <td>
                                         <div class="d-flex">
-                                            <button type="button" class="btn btn-primary mr-2" data-toggle="modal" data-target="#viewPassenger" data-ticket-code="<?php echo htmlspecialchars($ticket['ticket_code']); ?>">
-                                                View
-                                            </button>
                                             <a href="#" class="btn btn-warning mr-2 mark-paid-ticket-cargo" data-id="<?php echo $ticket['ticket_code']; ?>">Paid</a>
                                             <a href="#" class="btn btn-danger cancel-ticket-cargo" data-id="<?php echo $ticket['ticket_code']; ?>">Cancel</a>
                                         </div>
@@ -113,60 +110,6 @@ $cargos = $cargo_stmt->fetchAll(PDO::FETCH_ASSOC);
 <!-- /.container-fluid -->
 
 
-
-
-<!-- View Passenger Modal-->
-<div class="modal fade" id="viewPassenger" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">List of Passenger</h5>
-                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">
-
-                <form id="AddPassengerForm" class="user" method="POST">
-                    <div class="row">
-                        <!-- Left-->
-                        <div class="col-xl-12 col-md-6">
-
-
-                            <div class="form-group row">
-                                <div class="col-md-12">
-
-                                    <div class="d-flex justify-content-between">
-                                        <h6 class="m-0 font-weight-bold text-primary"></h6>
-                                        <a class="btn btn-primary" id="print"><i class="fas fa-print"></i> </a>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            <div class="form-group row">
-
-                                <div class="col-md-12">
-                                    <div class="mb-3" id="printTicket">
-
-
-
-
-
-                                    </div>
-                                </div>
-                            </div>
-
-
-                        </div>
-                    </div>
-            </div>
-
-            </form>
-        </div>
-    </div>
-</div>
 <script src="assets/admin/vendor/jquery/jquery.min.js"></script>
 <?php include 'footer.php' ?>
 

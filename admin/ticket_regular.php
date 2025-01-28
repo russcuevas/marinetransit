@@ -74,7 +74,7 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </thead>
                     <tbody>
                         <?php foreach ($tickets as $index => $ticket): ?>
-                            <?php if ($ticket['ticket_status'] == 'Pending'): ?> <!-- Check if ticket status is Pending -->
+                            <?php if ($ticket['ticket_status'] == 'Pending'): ?>
                                 <tr>
                                     <td><img style="height: 70px;" src="../qr_codes/<?php echo htmlspecialchars($ticket['qr_code']); ?>" alt="QR Code"></td>
                                     <td><?php echo $ticket['ticket_date'] . " / " . $ticket['schedule_time']; ?></td>
@@ -85,10 +85,10 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td><?= htmlspecialchars($ticket['total_ticket_price']) ?></td>
                                     <td><?= htmlspecialchars($ticket['ticket_status']) ?></td>
                                     <td>
-                                        <button class="btn btn-primary btn-sm view-passengers"
-                                            data-ticket-code="<?= htmlspecialchars($ticket['ticket_code']) ?>">View</button>
-                                        <a href="#" class="btn btn-warning mr-2 mark-paid-ticket-passengers" data-id="<?php echo $ticket['ticket_code']; ?>">Paid</a>
-                                        <a href="#" class="btn btn-danger cancel-ticket-cargo" data-id="<?php echo $ticket['ticket_code']; ?>">Cancel</a>
+                                        <div class="d-flex">
+                                            <a href="#" class="btn btn-warning mr-2 mark-paid-ticket-passengers" data-id="<?php echo $ticket['ticket_code']; ?>">Paid</a>
+                                            <a href="#" class="btn btn-danger cancel-ticket-cargo" data-id="<?php echo $ticket['ticket_code']; ?>">Cancel</a>
+                                        </div>
                                     </td>
                                 </tr>
                             <?php endif; ?>
@@ -98,63 +98,9 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </div>
     </div>
-
-
-
 </div>
 
-<!-- View Passenger Modal-->
-<div class="modal fade" id="viewPassenger" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">List of Passenger</h5>
-                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">
 
-                <form id="AddPassengerForm" class="user" method="POST">
-                    <div class="row">
-                        <!-- Left-->
-                        <div class="col-xl-12 col-md-6">
-
-
-                            <div class="form-group row">
-                                <div class="col-md-12">
-
-                                    <div class="d-flex justify-content-between">
-                                        <h6 class="m-0 font-weight-bold text-primary"></h6>
-                                        <a class="btn btn-primary" id="print"><i class="fas fa-print"></i> </a>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            <div class="form-group row">
-
-                                <div class="col-md-12">
-                                    <div class="mb-3" id="printTicket">
-
-
-
-
-
-                                    </div>
-                                </div>
-                            </div>
-
-
-                        </div>
-                    </div>
-            </div>
-
-            </form>
-        </div>
-    </div>
-</div>
 <script src="assets/admin/vendor/jquery/jquery.min.js"></script>
 
 <?php include 'footer.php' ?>

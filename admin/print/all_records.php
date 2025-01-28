@@ -108,7 +108,6 @@ foreach ($report as $reports) {
             <tr>
                 <th>Ticket No.</th>
                 <th>Name</th>
-                <th>Schedule Date/Time</th>
                 <th>Ship</th>
                 <th>From</th>
                 <th>To</th>
@@ -120,7 +119,6 @@ foreach ($report as $reports) {
                 <tr>
                     <td><?= htmlspecialchars($reports['ticket_code']); ?></td>
                     <td><?= htmlspecialchars($reports['contact_person']); ?></td>
-                    <td><?= htmlspecialchars($reports['schedule_time']); ?></td>
                     <td><?= htmlspecialchars($reports['ship_name']); ?></td>
                     <td><?= htmlspecialchars($reports['route_from']); ?></td> <!-- Display route_from -->
                     <td><?= htmlspecialchars($reports['route_to']); ?></td> <!-- Display route_to -->
