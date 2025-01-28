@@ -51,6 +51,10 @@ $route_count = $route_result['route_count'];
     .card-body .text-white {
         color: #000 !important;
     }
+
+    .border-bottom-primary {
+        border-bottom: .25rem solid white !important;
+    }
 </style>
 <!-- Begin Page Content -->
 <div class="container-fluid">
@@ -66,85 +70,85 @@ $route_count = $route_result['route_count'];
 
         <!-- Passengers Card -->
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card shadow h-100 py-2 bg-gradient-secondary">
+            <div class="card shadow h-100 py-2 bg-gradient-primary">
                 <div class="card-body border-bottom-primary mx-2" id="passengerDiv">
                     <div class="row no-gutters align-items-center">
                         <div class="col-auto mr-5">
-                            <i class="fas fa-users fa-3x text-white"></i>
+                            <i class="fas fa-users fa-3x text-white" style="color: white !important;"></i>
                         </div>
                         <div class="col mr-2">
-                            <div class="h5 mb-0 font-weight-bold text-white">Passengers</div>
+                            <div class="h5 mb-0 font-weight-bold" style="color: white !important;">Passengers</div>
                         </div>
                     </div>
-                    <h3 class="m-0 text-right text-white font-weight-bold"><?php echo $passenger_count; ?></h3>
+                    <h3 class="m-0 text-right text-white font-weight-bold" style="color: white !important;"><?php echo $passenger_count; ?></h3>
                 </div>
             </div>
         </div>
 
         <!-- Vessels Card -->
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card shadow h-100 py-2 bg-gradient-secondary">
+            <div class="card shadow h-100 py-2 bg-gradient-primary">
                 <div class="card-body border-bottom-primary mx-2" id="shipDiv">
                     <div class="row no-gutters align-items-center">
                         <div class="col-auto mr-5">
-                            <i class="fas fa-ship fa-3x text-white"></i>
+                            <i class="fas fa-ship fa-3x text-white" style="color: white !important;"></i>
                         </div>
                         <div class="col mr-2">
-                            <div class="h5 mb-0 font-weight-bold text-white">Vessel</div>
+                            <div class="h5 mb-0 font-weight-bold text-white" style="color: white !important;">Vessel</div>
                         </div>
                     </div>
-                    <h3 class="m-0 text-right text-white font-weight-bold"><?php echo $ship_count; ?></h3>
+                    <h3 class="m-0 text-right text-white font-weight-bold" style="color: white !important;"><?php echo $ship_count; ?></h3>
                 </div>
             </div>
         </div>
 
         <!-- Schedule Card -->
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card shadow h-100 py-2 bg-gradient-secondary">
+            <div class="card shadow h-100 py-2 bg-gradient-primary">
                 <div class="card-body border-bottom-primary mx-2" id="scheduleDiv">
                     <div class="row no-gutters align-items-center">
                         <div class="col-auto mr-5">
-                            <i class="fas fa-calendar fa-3x text-white"></i>
+                            <i class="fas fa-calendar fa-3x text-white" style="color: white !important;"></i>
                         </div>
                         <div class="col mr-2">
-                            <div class="h5 mb-0 font-weight-bold text-white">Schedule</div>
+                            <div class="h5 mb-0 font-weight-bold text-white" style="color: white !important;">Schedule</div>
                         </div>
                     </div>
-                    <h3 class="m-0 text-right text-white font-weight-bold"><?php echo $schedule_count; ?></h3>
+                    <h3 class="m-0 text-right text-white font-weight-bold" style="color: white !important;"><?php echo $schedule_count; ?></h3>
                 </div>
             </div>
         </div>
 
         <!-- Payment Card -->
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card shadow h-100 py-2 bg-gradient-secondary">
+            <div class="card shadow h-100 py-2 bg-gradient-primary">
                 <div class="card-body border-bottom-primary mx-2" id="paymentDiv">
                     <div class="row no-gutters align-items-center">
                         <div class="col-auto mr-5">
-                            <i class="fas fa-dollar-sign fa-3x text-white"></i>
+                            <i class="fas fa-dollar-sign fa-3x text-white" style="color: white !important;"></i>
                         </div>
                         <div class="col mr-2">
-                            <div class="h5 mb-0 font-weight-bold text-white">Payment</div>
+                            <div class="h5 mb-0 font-weight-bold text-white" style="color: white !important;">Payment</div>
                         </div>
                     </div>
-                    <h3 class="m-0 text-right text-white font-weight-bold"><?php echo $payment_count; ?></h3>
+                    <h3 class="m-0 text-right text-white font-weight-bold" style="color: white !important;"><?php echo $payment_count; ?></h3>
                 </div>
             </div>
         </div>
 
         <!-- Route Card -->
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card shadow h-100 py-2 bg-gradient-secondary">
+            <div class="card shadow h-100 py-2 bg-gradient-primary">
                 <div class="card-body border-bottom-primary mx-2" id="routeDiv">
                     <div class="row no-gutters align-items-center">
                         <div class="col-auto mr-5">
-                            <i class="fas fa-route fa-3x text-white"></i>
+                            <i class="fas fa-route fa-3x text-white" style="color: white !important;"></i>
                         </div>
                         <div class="col mr-2">
-                            <div class="h5 mb-0 font-weight-bold text-white">Route</div>
+                            <div class="h5 mb-0 font-weight-bold text-white" style="color: white !important;">Route</div>
                         </div>
                     </div>
-                    <h3 class="m-0 text-right text-white font-weight-bold"><?php echo $route_count; ?></h3>
+                    <h3 class="m-0 text-right text-white font-weight-bold" style="color: white !important;"><?php echo $route_count; ?></h3>
                 </div>
             </div>
         </div>

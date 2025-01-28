@@ -71,7 +71,7 @@ $systeminfo_icon = $system_info['systeminfo_icon'] ? $system_info['systeminfo_ic
     <div id="wrapper">
 
         <!-- Sidebar -->
-        <ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar" style="background: #d5d6d7; color: black!important;">
+        <ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar" style="background:rgb(177, 166, 166); color: black!important;">
 
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-start" href="admin" style="background: #000957 ">
@@ -96,6 +96,13 @@ $systeminfo_icon = $system_info['systeminfo_icon'] ? $system_info['systeminfo_ic
                 <a class="nav-link" href="dashboard.php">
                     <i class="fas fa-fw fa-home"></i>
                     <span>Home</span>
+                </a>
+            </li>
+
+            <li class="nav-item" id="nav-cashier">
+                <a class="nav-link" href="cashier.php">
+                    <i class="fas fa-fw fa-credit-card"></i>
+                    <span>Cashier</span>
                 </a>
             </li>
 
@@ -253,6 +260,10 @@ $systeminfo_icon = $system_info['systeminfo_icon'] ? $system_info['systeminfo_ic
 
                     if (currentURL.includes('ratings.php')) {
                         setActiveLink('nav-rating');
+                    }
+
+                    if (currentURL.includes('cashier.php')) {
+                        setActiveLink('nav-cashier');
                     }
 
                     if (currentURL.includes('schedule.php')) {
