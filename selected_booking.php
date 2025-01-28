@@ -1,5 +1,10 @@
 <?php
 require_once('phpqrcode/qrlib.php');
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require 'vendor/autoload.php';
 include 'connection/database.php';
 
 if (isset($_GET['schedule_id']) && !empty($_GET['schedule_id'])) {
@@ -63,6 +68,8 @@ if (isset($_POST['book'])) {
             $accommodation_fare = $_POST['fare'][$index];
 
             $ticket_price = $accommodation_fare;
+
+            // Insert ticket details
             $insertTicketQuery = "
                 INSERT INTO tickets (ticket_date, ticket_code, ticket_price, ticket_type, ticket_status, schedule_id, contact_person, contact_number, contact_email, contact_address)
                 VALUES (:ticket_date, :ticket_code, :ticket_price, :ticket_type, :ticket_status, :schedule_id, :contact_person, :contact_number, :contact_email, :contact_address)
@@ -82,6 +89,7 @@ if (isset($_POST['book'])) {
 
             $ticket_id = $conn->lastInsertId();
 
+            // Insert passenger details
             $insertPassengerQuery = "
                 INSERT INTO passengers (ticket_id, passenger_fname, passenger_mname, passenger_lname, passenger_bdate, passenger_contact, passenger_address, passenger_type, passenger_gender)
                 VALUES (:ticket_id, :first_name, :middle_name, :last_name, :birthdate, :contact, :address, :passenger_type, :gender)
@@ -99,9 +107,10 @@ if (isset($_POST['book'])) {
             $stmt->execute();
         }
 
-        $qr_image_directory = 'qr_codes/'; // Directory for storing QR codes
-        $qr_image_filename = $ticket_code . '.png'; // Only the filename
-        $qr_image_path = $qr_image_directory . $qr_image_filename; // Full path for file creation
+        // Generate QR Code
+        $qr_image_directory = 'qr_codes/';
+        $qr_image_filename = $ticket_code . '.png';
+        $qr_image_path = $qr_image_directory . $qr_image_filename;
 
         if (!file_exists($qr_image_path)) {
             if (!file_exists($qr_image_directory)) {
@@ -113,16 +122,47 @@ if (isset($_POST['book'])) {
             );
 
             $updateTicketQuery = "
-        UPDATE tickets 
-        SET qr_code = :qr_code 
-        WHERE ticket_code = :ticket_code
-    ";
+                UPDATE tickets 
+                SET qr_code = :qr_code 
+                WHERE ticket_code = :ticket_code
+            ";
             $stmt = $conn->prepare($updateTicketQuery);
-            $stmt->bindParam(':qr_code', $qr_image_filename); // Save only the filename
+            $stmt->bindParam(':qr_code', $qr_image_filename);
             $stmt->bindParam(':ticket_code', $ticket_code);
             $stmt->execute();
         }
-        $_SESSION['success'] = 'Booking successfully!';
+
+        // Send Email
+        $mail = new PHPMailer();
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'gmanagementtt111@gmail.com';
+        $mail->Password = 'skbtosbmkiffrajr';
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;
+
+        $mail->setFrom('your_email@example.com', 'Marine Transit Booking');
+        $mail->addAddress($contact_email, $contact_person);
+
+        $mail->isHTML(true);
+        $mail->Subject = 'Booking Confirmation - Ticket Code: ' . $ticket_code;
+        $emailBody = "<h3>This is your ticket confirmation. Please pay on Balingoan Port to confirm booking.</h3>";
+        $emailBody .= "<p><strong>Reference Number:</strong> {$ticket_code}</p>";
+        $emailBody .= "<hr><h4>Passenger Details</h4><ul>";
+
+        foreach ($_POST['passenger_fname'] as $index => $first_name) {
+            $emailBody .= "<li>{$first_name} {$_POST['passenger_lname'][$index]} - {$_POST['passenger_type'][$index]}</li>";
+        }
+
+        $emailBody .= "</ul>";
+        $mail->Body = $emailBody;
+
+        if ($mail->send()) {
+            $_SESSION['success'] = 'Booking successful! Confirmation email sent.';
+        } else {
+            $_SESSION['error'] = 'Booking successful, but email could not be sent.';
+        }
     } else {
         $_SESSION['error'] = 'Please add at least one passenger.';
     }

@@ -73,29 +73,33 @@ $cargos = $cargo_stmt->fetchAll(PDO::FETCH_ASSOC);
                     </thead>
                     <tbody>
                         <?php foreach ($tickets as $index => $ticket): ?>
-                            <tr>
-                                <td><img style="height: 70px;" src="../qr_codes/<?php echo htmlspecialchars($ticket['qr_code']); ?>" alt="QR Code"></td>
-                                <td><?php echo htmlspecialchars($ticket['ticket_date']); ?></td>
-                                <td><?php echo htmlspecialchars($ticket['contact_person']); ?></td>
-                                <td>
-                                    <?php
-                                    foreach ($cargos as $cargo):
-                                        if ($cargo['ticket_code'] === $ticket['ticket_code']):
-                                    ?>
-                                            <p><?php echo htmlspecialchars($cargo['accomodation_name']); ?></p>
-                                    <?php endif;
-                                    endforeach; ?>
-                                </td>
-                                <td><?php echo htmlspecialchars($ticket['ship_name']); ?></td>
-                                <td><?php echo htmlspecialchars($ticket['route_from']); ?></td>
-                                <td><?php echo htmlspecialchars($ticket['route_to']); ?></td>
-                                <td><?php echo htmlspecialchars($ticket['ticket_status']); ?></td>
-                                <td>
-                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#viewPassenger" data-ticket-code="<?php echo htmlspecialchars($ticket['ticket_code']); ?>">
-                                        View
-                                    </button>
-                                </td>
-                            </tr>
+                            <?php if ($ticket['ticket_status'] == 'Pending'): ?>
+                                <tr>
+                                    <td><img style="height: 70px;" src="../qr_codes/<?php echo htmlspecialchars($ticket['qr_code']); ?>" alt="QR Code"></td>
+                                    <td><?php echo htmlspecialchars($ticket['ticket_date']); ?></td>
+                                    <td><?php echo htmlspecialchars($ticket['contact_person']); ?></td>
+                                    <td>
+                                        <?php
+                                        foreach ($cargos as $cargo):
+                                            if ($cargo['ticket_code'] === $ticket['ticket_code']):
+                                        ?>
+                                                <p><?php echo htmlspecialchars($cargo['accomodation_name']); ?></p>
+                                        <?php endif;
+                                        endforeach; ?>
+                                    </td>
+                                    <td><?php echo htmlspecialchars($ticket['ship_name']); ?></td>
+                                    <td><?php echo htmlspecialchars($ticket['route_from']); ?></td>
+                                    <td><?php echo htmlspecialchars($ticket['route_to']); ?></td>
+                                    <td><?php echo htmlspecialchars($ticket['ticket_status']); ?></td>
+                                    <td>
+                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#viewPassenger" data-ticket-code="<?php echo htmlspecialchars($ticket['ticket_code']); ?>">
+                                            View
+                                        </button>
+                                        <a href="#" class="btn btn-warning mark-paid-ticket-cargo" data-id="<?php echo $ticket['ticket_code']; ?>">Paid</a>
+                                        <a href="#" class="btn btn-danger cancel-ticket" data-id="<?php echo $ticket['ticket_code']; ?>">Cancel</a>
+                                    </td>
+                                </tr>
+                            <?php endif; ?>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -162,3 +166,56 @@ $cargos = $cargo_stmt->fetchAll(PDO::FETCH_ASSOC);
 </div>
 <script src="assets/admin/vendor/jquery/jquery.min.js"></script>
 <?php include 'footer.php' ?>
+
+<script>
+    $(document).on('click', '.mark-paid-ticket-cargo', function() {
+        var ticket_code = $(this).data('id'); // Retrieve ticket_code from button's data-id
+        if (confirm('Are you sure this ticket is paid?')) {
+            $.ajax({
+                type: 'POST',
+                url: 'mark_paid_ticket_cargo.php',
+                data: {
+                    ticket_code: ticket_code // Send ticket_code to the backend
+                },
+                success: function(response) {
+                    var res = JSON.parse(response);
+
+                    if (res.status === 'success') {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Ticket status has been updated to Paid and Report added.',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        });
+                    } else if (res.status === 'failure') {
+                        Swal.fire({
+                            title: 'Failed!',
+                            text: res.message || 'Failed to update ticket status or insert report.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    } else if (res.status === 'error') {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: res.message || 'An unexpected error occurred. Please try again later.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'An error occurred. Please try again later.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        }
+    });
+</script>

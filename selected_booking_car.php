@@ -1,6 +1,11 @@
 <?php
 session_start();
 require_once('phpqrcode/qrlib.php');
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require 'vendor/autoload.php';
 include 'connection/database.php';
 
 if (isset($_GET['schedule_accom_id']) && !empty($_GET['schedule_accom_id'])) {
@@ -165,7 +170,38 @@ if (isset($_POST['book'])) {
             $stmt->execute();
         }
     }
-    $_SESSION['success'] = 'Booking successful!';
+    $mail = new PHPMailer(true); // Pass `true` to enable exceptions
+
+    $mail->isSMTP();
+    $mail->Host = 'smtp.gmail.com';
+    $mail->SMTPAuth = true;
+    $mail->Username = 'gmanagementtt111@gmail.com';
+    $mail->Password = 'skbtosbmkiffrajr'; // Make sure this is correct and secure
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+    $mail->Port = 587;
+
+    $mail->setFrom('gmanagementtt111@gmail.com', 'Marine Transit Booking');
+    $mail->addAddress($contact_email, $contact_person);
+
+    $mail->isHTML(true);
+    $mail->Subject = 'Booking Confirmation - Ticket Code: ' . $ticket_code;
+    $emailBody = "<h3>This is your ticket confirmation. Please pay on Balingoan Port to confirm booking.</h3>";
+    $emailBody .= "<p><strong>Reference Number:</strong> {$ticket_code}</p>";
+    $emailBody .= "<hr><h4>Passenger Details</h4><ul>";
+
+    foreach ($_POST['passenger_fname'] as $index => $first_name) {
+        $emailBody .= "<li>{$first_name} {$_POST['passenger_lname'][$index]} - {$_POST['passenger_type'][$index]}</li>";
+    }
+
+    $emailBody .= "</ul>";
+    $mail->Body = $emailBody;
+
+    try {
+        $mail->send();
+        $_SESSION['success'] = 'Booking successful!';
+    } catch (Exception $e) {
+        $_SESSION['error'] = 'Error sending email: ' . $mail->ErrorInfo;
+    }
 }
 
 ?>

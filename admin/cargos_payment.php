@@ -86,32 +86,34 @@ try {
                     <tbody>
                         <?php if (!empty($tickets)): ?>
                             <?php foreach ($tickets as $ticket): ?>
-                                <tr>
-                                    <td><?php echo $ticket['ticket_id']; ?></td>
-                                    <td><?php echo $ticket['ticket_code']; ?></td>
-                                    <td><?php echo $ticket['ticket_date'] . " / " . $ticket['schedule_time']; ?></td>
-                                    <td><?php echo $ticket['ship_name']; ?></td>
-                                    <td><?php echo $ticket['route_from']; ?></td>
-                                    <td><?php echo $ticket['route_to']; ?></td>
-                                    <td><?php echo $ticket['ticket_price']; ?></td>
-                                    <td><?php echo $ticket['ticket_status']; ?></td>
-                                    <td>
-                                        <?php if ($ticket['ticket_status'] == 'Cancelled') { ?>
-                                            <a href="#" class="btn btn-success view"
-                                                data-ticket_code="<?php echo $ticket['ticket_code']; ?>"
-                                                data-from="<?php echo $ticket['route_from']; ?>"
-                                                data-to="<?php echo $ticket['route_to']; ?>">View</a>
-                                            <a href="#" class="btn btn-danger delete-ticket" data-id="<?php echo $ticket['ticket_id']; ?>">Delete</a>
-                                        <?php } else { ?>
-                                            <a href="#" class="btn btn-success view"
-                                                data-id="<?php echo $ticket['ticket_id']; ?>"
-                                                data-from="<?php echo $ticket['route_from']; ?>"
-                                                data-to="<?php echo $ticket['route_to']; ?>">View</a>
-                                            <a href="#" class="btn btn-warning mark-paid" data-id="<?php echo $ticket['ticket_id']; ?>">Paid</a>
-                                            <a href="#" class="btn btn-danger cancel-ticket" data-id="<?php echo $ticket['ticket_id']; ?>">Cancel</a>
-                                        <?php } ?>
-                                    </td>
-                                </tr>
+                                <?php if ($ticket['ticket_status'] == 'Pending' || $ticket['ticket_status'] == 'Cancelled'): ?>
+                                    <tr>
+                                        <td><?php echo $ticket['ticket_id']; ?></td>
+                                        <td><?php echo $ticket['ticket_code']; ?></td>
+                                        <td><?php echo $ticket['ticket_date'] . " / " . $ticket['schedule_time']; ?></td>
+                                        <td><?php echo $ticket['ship_name']; ?></td>
+                                        <td><?php echo $ticket['route_from']; ?></td>
+                                        <td><?php echo $ticket['route_to']; ?></td>
+                                        <td><?php echo $ticket['ticket_price']; ?></td>
+                                        <td><?php echo $ticket['ticket_status']; ?></td>
+                                        <td>
+                                            <?php if ($ticket['ticket_status'] == 'Cancelled') { ?>
+                                                <a href="#" class="btn btn-success view"
+                                                    data-ticket_code="<?php echo $ticket['ticket_code']; ?>"
+                                                    data-from="<?php echo $ticket['route_from']; ?>"
+                                                    data-to="<?php echo $ticket['route_to']; ?>">View</a>
+                                                <a href="#" class="btn btn-danger delete-ticket" data-id="<?php echo $ticket['ticket_id']; ?>">Delete</a>
+                                            <?php } else { ?>
+                                                <a href="#" class="btn btn-success view"
+                                                    data-id="<?php echo $ticket['ticket_id']; ?>"
+                                                    data-from="<?php echo $ticket['route_from']; ?>"
+                                                    data-to="<?php echo $ticket['route_to']; ?>">View</a>
+                                                <a href="#" class="btn btn-warning mark-paid" data-id="<?php echo $ticket['ticket_id']; ?>">Paid</a>
+                                                <a href="#" class="btn btn-danger cancel-ticket" data-id="<?php echo $ticket['ticket_id']; ?>">Cancel</a>
+                                            <?php } ?>
+                                        </td>
+                                    </tr>
+                                <?php endif; ?>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>

@@ -13,7 +13,7 @@ $ticketQuery = "
            t.contact_email, t.contact_address,
            r1.route_from AS route_from_id, r2.route_to AS route_to_id,
            p1.port_name AS route_from, p2.port_name AS route_to,
-           sh.ship_name,
+           sh.ship_name, s.schedule_time,  -- Added schedule_time here
            GROUP_CONCAT(p.passenger_fname, ' ', p.passenger_lname ORDER BY p.passenger_fname SEPARATOR ', ') AS passengers_names,
            GROUP_CONCAT(p.passenger_contact ORDER BY p.passenger_fname SEPARATOR ', ') AS passengers_contacts,
            GROUP_CONCAT(p.passenger_type ORDER BY p.passenger_fname SEPARATOR ', ') AS passengers_types,
@@ -31,8 +31,9 @@ $ticketQuery = "
     GROUP BY t.ticket_code, t.ticket_status, t.ticket_date, t.contact_person, 
              t.contact_number, t.contact_email, t.contact_address, 
              r1.route_from, r2.route_to, p1.port_name, p2.port_name, 
-             sh.ship_name, t.qr_code
+             sh.ship_name, s.schedule_time, t.qr_code  -- Group by schedule_time
 ";
+
 
 
 
@@ -73,20 +74,22 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </thead>
                     <tbody>
                         <?php foreach ($tickets as $index => $ticket): ?>
-                            <tr>
-                                <td><img style="height: 70px;" src="../qr_codes/<?php echo htmlspecialchars($ticket['qr_code']); ?>" alt="QR Code"></td>
-                                <td><?= htmlspecialchars($ticket['ticket_date']) ?></td>
-                                <td><?= htmlspecialchars($ticket['contact_person']) ?></td>
-                                <td><?= htmlspecialchars($ticket['ship_name']) ?></td>
-                                <td><?= htmlspecialchars($ticket['route_from']) ?></td>
-                                <td><?= htmlspecialchars($ticket['route_to']) ?></td>
-                                <td><?= htmlspecialchars($ticket['total_ticket_price']) ?></td>
-                                <td><?= htmlspecialchars($ticket['ticket_status']) ?></td>
-                                <td>
-                                    <button class="btn btn-primary btn-sm view-passengers"
-                                        data-ticket-code="<?= htmlspecialchars($ticket['ticket_code']) ?>">View</button>
-                                </td>
-                            </tr>
+                            <?php if ($ticket['ticket_status'] == 'Pending'): ?> <!-- Check if ticket status is Pending -->
+                                <tr>
+                                    <td><img style="height: 70px;" src="../qr_codes/<?php echo htmlspecialchars($ticket['qr_code']); ?>" alt="QR Code"></td>
+                                    <td><?php echo $ticket['ticket_date'] . " / " . $ticket['schedule_time']; ?></td>
+                                    <td><?= htmlspecialchars($ticket['contact_person']) ?></td>
+                                    <td><?= htmlspecialchars($ticket['ship_name']) ?></td>
+                                    <td><?= htmlspecialchars($ticket['route_from']) ?></td>
+                                    <td><?= htmlspecialchars($ticket['route_to']) ?></td>
+                                    <td><?= htmlspecialchars($ticket['total_ticket_price']) ?></td>
+                                    <td><?= htmlspecialchars($ticket['ticket_status']) ?></td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm view-passengers"
+                                            data-ticket-code="<?= htmlspecialchars($ticket['ticket_code']) ?>">View</button>
+                                    </td>
+                                </tr>
+                            <?php endif; ?>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
