@@ -26,6 +26,7 @@ $ticket_query = "
     JOIN ports p2 ON r2.route_to = p2.port_id
 ";
 
+
 $ticket_stmt = $conn->prepare($ticket_query);
 $ticket_stmt->execute();
 $tickets = $ticket_stmt->fetchAll(PDO::FETCH_ASSOC);
