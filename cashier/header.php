@@ -49,7 +49,7 @@ $systeminfo_icon = $system_info['systeminfo_icon'] ? $system_info['systeminfo_ic
 
         .navbar-nav span,
         .navbar-nav i {
-            color: #000 !important;
+            color: white !important;
             font-size: 15px !important;
         }
 
@@ -59,7 +59,7 @@ $systeminfo_icon = $system_info['systeminfo_icon'] ? $system_info['systeminfo_ic
         }
 
         .sidebar-dark .nav-item .nav-link[data-toggle=collapse]::after {
-            color: #000;
+            color: white;
         }
     </style>
 
@@ -71,11 +71,11 @@ $systeminfo_icon = $system_info['systeminfo_icon'] ? $system_info['systeminfo_ic
     <div id="wrapper">
 
         <!-- Sidebar -->
-        <ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar" style="background: #d5d6d7; color: black!important;">
+        <ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar" style="background:rgb(0, 0, 0); color: white !important;">
 
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-start" href="admin" style="background: #000957 ">
-                <img class="img-profile rounded-circle" src="assets/system_image/<?php echo $systeminfo_icon; ?>" style="height: 50px; width: auto;">
+                <img class="img-profile" src="assets/system_image/<?php echo $systeminfo_icon; ?>" style="height: 70px; width: auto;">
                 <div class="sidebar-brand-text mx-3" style="color: white !important"><?php echo $systeminfo_shortname; ?></div>
             </a>
             <!-- Divider -->
@@ -176,7 +176,7 @@ $systeminfo_icon = $system_info['systeminfo_icon'] ? $system_info['systeminfo_ic
 
                 <!-- Page Heading -->
                 <div class="d-sm-flex align-items-center justify-content-left p-2 mb-4" style="background: #000957 ">
-                    <img class="img-profile mx-2 rounded-circle" src="assets/admin/img/avatar2.png" style="height: 50px; width: auto;">
+                    <img class="img-profile mx-2 rounded-circle" src="assets/admin/img/cashier.jpg" style="height: 50px; width: auto;">
                     <div class="d-flex flex-column justify-content-center">
                         <h1 class="h4 mb-0" style="color: white !important;">Cashier Dashboard</h1>
                         <p style="color: white !important;">Melody Digdigan</p>

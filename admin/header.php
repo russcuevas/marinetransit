@@ -75,7 +75,7 @@ $systeminfo_icon = $system_info['systeminfo_icon'] ? $system_info['systeminfo_ic
 
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-start" href="admin" style="background: #000957 ">
-                <img class="img-profile rounded-circle" src="assets/system_image/<?php echo $systeminfo_icon; ?>" style="height: 50px; width: auto;">
+                <img class="img-profile" src="assets/system_image/<?php echo $systeminfo_icon; ?>" style="height: 70px; width: auto;">
                 <div class="sidebar-brand-text mx-3" style="color: white !important"><?php echo $systeminfo_shortname; ?></div>
             </a>
             <!-- Divider -->
