@@ -11,7 +11,8 @@ if (isset($_POST['login'])) {
     $user_name = $_POST['user_name'];
     $user_password = $_POST['user_password'];
 
-    $select_admin = $conn->prepare("SELECT * FROM `users` WHERE user_name = ? AND user_password = ?");
+    // Modify the query to check for user_type = 'cashier'
+    $select_admin = $conn->prepare("SELECT * FROM `users` WHERE user_name = ? AND user_password = ? AND user_type = 'cashier'");
     $select_admin->execute([$user_name, $user_password]);
 
     if ($select_admin->rowCount() > 0) {
@@ -25,6 +26,7 @@ if (isset($_POST['login'])) {
     }
 }
 ?>
+
 
 
 
