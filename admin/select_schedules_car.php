@@ -51,7 +51,7 @@ $schedules = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         <div class="container">
             <div class="row" style="padding: 15px;">
-                <div class="col-sm-12" style="background-color: #000957; padding: 50px;">
+                <div class="col-sm-12" style="background-color:rgb(34, 92, 143); padding: 50px;">
                     <h3 style="color: white!important"><strong>Available Schedules:</strong></h3>
                     <table class="table table-bordered" style="color: white; background-color: black;" id="myTable">
                         <thead>
@@ -65,24 +65,38 @@ $schedules = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($schedules as $schedule): ?>
-                                <tr>
-                                    <td><?php echo $schedule['accomodation_name']; ?></td>
-                                    <td><?php echo $schedule['schedule_date']; ?></td>
-                                    <td>
-                                        <?php
-                                        $time = DateTime::createFromFormat('H:i:s', $schedule['schedule_time']);
-                                        echo $time ? $time->format('h:i A') : 'Invalid Time';
-                                        ?>
-                                    </td>
-                                    <td><?php echo $schedule['route_from']; ?> - <?php echo $schedule['route_to']; ?></td>
-                                    <td><?php echo number_format($schedule['net_fare'], 2); ?></td>
+                            <?php
+                            $currentDate = new DateTime(); // Get the current date and time
+                            ?>
 
-                                    <td>
-                                        <a href="add_new_tickets_car.php?schedule_accom_id=<?php echo $schedule['schedule_accom_id']; ?>" class="btn btn-info">Select</a>
-                                    </td>
-                                </tr>
+                            <?php foreach ($schedules as $schedule): ?>
+                                <?php
+                                // Create DateTime objects for schedule date and time
+                                $scheduleDate = new DateTime($schedule['schedule_date']);
+                                $scheduleTime = DateTime::createFromFormat('H:i:s', $schedule['schedule_time']);
+                                $scheduleDateTime = $scheduleDate->setTime($scheduleTime->format('H'), $scheduleTime->format('i'));
+
+                                // Compare current date and time with the schedule date and time
+                                if ($scheduleDateTime >= $currentDate): ?>
+                                    <tr>
+                                        <td><?php echo $schedule['accomodation_name']; ?></td>
+                                        <td><?php echo $schedule['schedule_date']; ?></td>
+                                        <td>
+                                            <?php
+                                            // Format the schedule time for display
+                                            echo $scheduleTime ? $scheduleTime->format('h:i A') : 'Invalid Time';
+                                            ?>
+                                        </td>
+                                        <td><?php echo $schedule['route_from']; ?> - <?php echo $schedule['route_to']; ?></td>
+                                        <td><?php echo number_format($schedule['net_fare'], 2); ?></td>
+
+                                        <td>
+                                            <a href="add_new_tickets_car.php?schedule_accom_id=<?php echo $schedule['schedule_accom_id']; ?>" class="btn btn-info">Select</a>
+                                        </td>
+                                    </tr>
+                                <?php endif; ?>
                             <?php endforeach; ?>
+
                         </tbody>
                     </table>
                 </div>

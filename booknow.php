@@ -158,7 +158,7 @@ $current_time = date('H:i:s');
 
             <?php if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($schedules)): ?>
                 <div class="row" style="padding: 15px;">
-                    <div class="col-sm-12" style="background-color: #000957; padding: 50px;">
+                    <div class="col-sm-12" style="background-color:rgb(34, 92, 143); padding: 50px;">
                         <h3 style="color: white!important"><strong>Available Schedules:</strong></h3>
                         <table class="table table-bordered" style="color: white; background-color: black;" id="myTable">
                             <thead>
@@ -171,21 +171,29 @@ $current_time = date('H:i:s');
                                 </tr>
                             </thead>
                             <tbody>
+                                <?php
+                                $currentDate = new DateTime();
+                                ?>
                                 <?php foreach ($schedules as $schedule): ?>
-                                    <tr>
-                                        <td><?php echo $schedule['ship_name']; ?></td>
-                                        <td><?php echo $schedule['schedule_date'] ?></td>
-                                        <td>
-                                            <?php
-                                            $time = DateTime::createFromFormat('H:i:s', $schedule['schedule_time']);
-                                            echo $time ? $time->format('h:i A') : 'Invalid Time';
-                                            ?>
-                                        </td>
-                                        <td><?php echo $schedule['route_from']; ?> - <?php echo $schedule['route_to']; ?></td>
-                                        <td>
-                                            <a href="selected_booking.php?schedule_id=<?php echo $schedule['schedule_id']; ?>" class="btn btn-info">Select</a>
-                                        </td>
-                                    </tr>
+                                    <?php
+                                    $scheduleDate = new DateTime($schedule['schedule_date']);
+                                    $scheduleTime = DateTime::createFromFormat('H:i:s', $schedule['schedule_time']);
+                                    $scheduleDateTime = $scheduleDate->setTime($scheduleTime->format('H'), $scheduleTime->format('i'));
+                                    if ($scheduleDateTime >= $currentDate): ?>
+                                        <tr>
+                                            <td><?php echo $schedule['ship_name']; ?></td>
+                                            <td><?php echo $schedule['schedule_date']; ?></td>
+                                            <td>
+                                                <?php
+                                                echo $scheduleTime ? $scheduleTime->format('h:i A') : 'Invalid Time';
+                                                ?>
+                                            </td>
+                                            <td><?php echo $schedule['route_from']; ?> - <?php echo $schedule['route_to']; ?></td>
+                                            <td>
+                                                <a href="selected_booking.php?schedule_id=<?php echo $schedule['schedule_id']; ?>" class="btn btn-info">Select</a>
+                                            </td>
+                                        </tr>
+                                    <?php endif; ?>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
@@ -193,7 +201,7 @@ $current_time = date('H:i:s');
                 </div>
             <?php elseif ($_SERVER['REQUEST_METHOD'] === 'POST'): ?>
                 <div class="row" style="padding: 15px;">
-                    <div class="col-sm-12" style="background-color: #000957; padding: 50px;">
+                    <div class="col-sm-12" style="background-color:rgb(34, 92, 143); padding: 50px;">
                         <h3 style="color: white!important; text-align: left;"><strong>No Schedules Found</strong></h3>
                         <p style="color: white; text-align: left;">We couldn't find any trips matching your search. Please try again with different schedules.</p>
                     </div>

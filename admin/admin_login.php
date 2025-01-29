@@ -26,8 +26,6 @@ if (isset($_POST['login'])) {
 }
 ?>
 
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -83,6 +81,10 @@ if (isset($_POST['login'])) {
             color: #002960 !important;
             font-family: 'Recursive', 'Times New Roman', Times, serif;
         }
+
+        .alert {
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 
@@ -103,6 +105,9 @@ if (isset($_POST['login'])) {
                                             <img class="img-profile mx-2 rounded-circle" src="assets/admin/img/avatar2.png" style="height: 50px; width: auto;">
                                             <h2>Admin Login</h2>
                                         </div>
+
+
+
                                         <div class="form-group my-5">
                                             <label for="user_name">Username</label>
                                             <input type="text" class="form-control" id="user_name" name="user_name" placeholder="Username">
@@ -111,6 +116,13 @@ if (isset($_POST['login'])) {
                                             <label for="user_password">Password</label>
                                             <input type="password" class="form-control" name="user_password" id="user_password" placeholder="Password">
                                         </div>
+
+                                        <?php if (isset($_SESSION['unsuccess'])): ?>
+                                            <div class="alert alert-danger">
+                                                <?php echo $_SESSION['unsuccess']; ?>
+                                            </div>
+                                            <?php unset($_SESSION['unsuccess']); ?>
+                                        <?php endif; ?>
 
                                         <div class="form-group my-5 d-flex justify-content-end">
                                             <button type="submit" class="btn btn-info" name="login">LOGIN</button>

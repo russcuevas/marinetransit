@@ -212,7 +212,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             <?php if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($schedules)): ?>
                 <div class="row" style="padding: 15px;">
-                    <div class="col-sm-12" style="background-color: #000957; padding: 50px;">
+                    <div class="col-sm-12" style="background-color:rgb(34, 92, 143); padding: 50px;">
                         <h3 style="color: white!important"><strong>Available Schedules:</strong></h3>
                         <table class="table table-bordered" style="color: white; background-color: black;" id="myTable">
                             <thead>
@@ -226,23 +226,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($schedules as $schedule): ?>
-                                    <tr>
-                                        <td><?php echo $schedule['accomodation_name']; ?></td>
-                                        <td><?php echo $schedule['schedule_date']; ?></td>
-                                        <td>
-                                            <?php
-                                            $time = DateTime::createFromFormat('H:i:s', $schedule['schedule_time']);
-                                            echo $time ? $time->format('h:i A') : 'Invalid Time';
-                                            ?>
-                                        </td>
-                                        <td><?php echo $schedule['route_from']; ?> - <?php echo $schedule['route_to']; ?></td>
-                                        <td><?php echo number_format($schedule['net_fare'], 2); ?></td>
+                                <?php
+                                $currentDate = new DateTime();
+                                ?>
 
-                                        <td>
-                                            <a href="selected_booking_car.php?schedule_accom_id=<?php echo $schedule['schedule_accom_id']; ?>" class="btn btn-info">Select</a>
-                                        </td>
-                                    </tr>
+                                <?php foreach ($schedules as $schedule): ?>
+                                    <?php
+                                    $scheduleDate = new DateTime($schedule['schedule_date']);
+                                    $scheduleTime = DateTime::createFromFormat('H:i:s', $schedule['schedule_time']);
+                                    $scheduleDateTime = $scheduleDate->setTime($scheduleTime->format('H'), $scheduleTime->format('i'));
+
+                                    if ($scheduleDateTime >= $currentDate): ?>
+                                        <tr>
+                                            <td><?php echo $schedule['accomodation_name']; ?></td>
+                                            <td><?php echo $schedule['schedule_date']; ?></td>
+                                            <td>
+                                                <?php
+                                                echo $scheduleTime ? $scheduleTime->format('h:i A') : 'Invalid Time';
+                                                ?>
+                                            </td>
+                                            <td><?php echo $schedule['route_from']; ?> - <?php echo $schedule['route_to']; ?></td>
+                                            <td><?php echo number_format($schedule['net_fare'], 2); ?></td>
+
+                                            <td>
+                                                <a href="selected_booking_car.php?schedule_accom_id=<?php echo $schedule['schedule_accom_id']; ?>" class="btn btn-info">Select</a>
+                                            </td>
+                                        </tr>
+                                    <?php endif; ?>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
@@ -250,7 +260,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
             <?php elseif ($_SERVER['REQUEST_METHOD'] === 'POST'): ?>
                 <div class="row" style="padding: 15px;">
-                    <div class="col-sm-12" style="background-color: #000957; padding: 50px;">
+                    <div class="col-sm-12" style="background-color:rgb(34, 92, 143); padding: 50px;">
                         <h3 style="color: white!important; text-align: left;"><strong>No Schedules Found</strong></h3>
                         <p style="color: white; text-align: left;">We couldn't find any trips matching your search. Please try again with different schedules.</p>
                     </div>
