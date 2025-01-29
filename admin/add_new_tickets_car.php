@@ -283,17 +283,11 @@ if (isset($_POST['book'])) {
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="contact_email_confirm">Confirm Email Address</label>
-                            <input type="email" class="form-control form-control-sm" name="contact_email_confirm">
-                            <div class="invalid-feedback">
-                                Please enter a valid email address for shipping updates.
-                            </div>
-                        </div>
+
 
                         <div class="mb-3">
                             <label for="contact_address">Address</label>
-                            <textarea rows="3" class="form-control form-control-sm" name="contact_address"
+                            <textarea rows="1" class="form-control form-control-sm" name="contact_address"
                                 required></textarea>
                             <div style="text-align: right; color: red; font-size: 13px">
                                 Ex: Purok, Barangay, Municipality

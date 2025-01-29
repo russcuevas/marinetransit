@@ -225,10 +225,10 @@ $systeminfo_icon = $system_info['systeminfo_icon'] ? $system_info['systeminfo_ic
 
                 <!-- Page Heading -->
                 <div class="d-sm-flex align-items-center justify-content-left p-2 mb-4" style="background: #000957 ">
-                    <img class="img-profile mx-2 rounded-circle" src="assets/admin/img/avatar2.png" style="height: 50px; width: auto;">
+                    <img class="img-profile mx-2 rounded-circle" src="assets/admin/img/system_dashboard.jpg" style="height: 50px; width: auto;">
                     <div class="d-flex flex-column justify-content-center">
                         <h1 class="h4 mb-0" style="color: white !important;">Administrator Dashboard</h1>
-                        <p style="color: white !important;">Melody Digdigan</p>
+                        <p style="color: white !important;">Melbin Querequere</p>
                     </div>
                 </div>
 
