@@ -74,7 +74,7 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </thead>
                     <tbody>
                         <?php foreach ($tickets as $index => $ticket): ?>
-                            <?php if ($ticket['ticket_status'] == 'Pending'): ?>
+                            <?php if ($ticket['ticket_status'] == 'Pending' || $ticket['ticket_status'] == 'Paid'): ?>
                                 <tr>
                                     <td><img style="height: 70px;" src="../qr_codes/<?php echo htmlspecialchars($ticket['qr_code']); ?>" alt="QR Code"></td>
                                     <td><?php echo $ticket['ticket_date'] . " / " . $ticket['schedule_time']; ?></td>
@@ -86,9 +86,13 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td><?= htmlspecialchars($ticket['ticket_status']) ?></td>
                                     <td>
                                         <div class="d-flex">
-                                            <a href="#" class="btn btn-warning mr-2 mark-paid-ticket-passengers" data-id="<?php echo $ticket['ticket_code']; ?>">Paid</a>
-                                            <a href="#" class="btn btn-danger cancel-ticket-cargo" data-id="<?php echo $ticket['ticket_code']; ?>">Cancel</a>
+                                            <a href="view_passenger_ticket.php?ticket_code=<?php echo urlencode($ticket['ticket_code']); ?>" class="btn btn-primary mr-2">View</a>
+                                            <?php if ($ticket['ticket_status'] != 'Paid'): ?>
+                                                <a href="#" class="btn btn-warning mr-2 mark-paid-ticket-passengers" data-id="<?php echo $ticket['ticket_code']; ?>">Paid</a>
+                                                <a href="#" class="btn btn-danger cancel-ticket-cargo" data-id="<?php echo $ticket['ticket_code']; ?>">Cancel</a>
+                                            <?php endif; ?>
                                         </div>
+
                                     </td>
                                 </tr>
                             <?php endif; ?>

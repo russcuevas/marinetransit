@@ -316,8 +316,8 @@ if (isset($_POST['book'])) {
                         <label for="contact_address">Address</label>
                         <textarea rows="3" class="form-control form-control-sm" name="contact_address"
                             required></textarea>
-                        <div class="invalid-feedback">
-                            Please enter your shipping address.
+                        <div style="text-align: right; color: red; font-size: 13px">
+                            Ex: Purok, Barangay, Municipality
                         </div>
                     </div>
 
@@ -412,6 +412,9 @@ if (isset($_POST['book'])) {
                                 <div class="col-md-6 form-group">
                                     <label for="passenger_address">Address</label>
                                     <textarea rows="3" class="form-control form-control-sm" name="passenger_address" required></textarea>
+                                    <div style="text-align: right; color: red; font-size: 13px">
+                                        Ex: Purok, Barangay, Municipality
+                                    </div>
                                 </div>
                             </div>
                             <button type="submit" style="float: right;" class="btn btn-primary mt-3">Save</button>

@@ -98,10 +98,6 @@ try {
                                         <td><?php echo $ticket['ticket_status']; ?></td>
                                         <td>
                                             <?php if ($ticket['ticket_status'] == 'Cancelled') { ?>
-                                                <a href="#" class="btn btn-success view"
-                                                    data-ticket_code="<?php echo $ticket['ticket_code']; ?>"
-                                                    data-from="<?php echo $ticket['route_from']; ?>"
-                                                    data-to="<?php echo $ticket['route_to']; ?>">View</a>
                                                 <a href="#" class="btn btn-danger delete-ticket" data-id="<?php echo $ticket['ticket_id']; ?>">Delete</a>
                                             <?php } else { ?>
                                                 <a href="#" class="btn btn-success view"
