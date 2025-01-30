@@ -215,12 +215,13 @@ $systeminfo_icon = $system_info['systeminfo_icon'] ? $system_info['systeminfo_ic
             <div id="content">
 
                 <!-- Topbar -->
-                <nav class="navbar navbar-expand navbar-light topbar mb-4 static-top shadow" style="background: #000957 ">
-
-                    <h3 class="text-white font-weight-bold"><?php echo $systeminfo_name; ?></h3>
-
-
+                <nav class="navbar navbar-expand navbar-light topbar mb-4 static-top shadow" style="background: #000957; padding: 10px;">
+                    <div class="container-fluid d-flex justify-content-between align-items-center w-100">
+                        <h3 class="text-white font-weight-bold m-0"><?php echo $systeminfo_name; ?></h3>
+                        <h6 style="font-size: 15px" class="text-white font-weight-bold m-0"><i class="fas fa-user"></i>&nbsp; CEBU MAIN OFFICE</h6>
+                    </div>
                 </nav>
+
                 <!-- End of Topbar -->
 
                 <!-- Page Heading -->
