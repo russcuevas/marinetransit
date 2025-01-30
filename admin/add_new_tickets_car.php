@@ -12,32 +12,36 @@ if (isset($_GET['schedule_accom_id']) && !empty($_GET['schedule_accom_id'])) {
     $schedule_accom_id = $_GET['schedule_accom_id'];
 
     $query = "
-    SELECT
-        sa.schedule_accom_id,
-        sa.net_fare,
-        a.accomodation_id,
-        a.accomodation_name,
-        a.accomodation_type,
-        s.schedule_id,
-        s.schedule_time,
-        s.schedule_date, -- Add this line to include schedule_date
-        r_from.port_name AS route_from,
-        r_to.port_name AS route_to
-    FROM
-        schedule_accom sa
-    LEFT JOIN
-        accomodations a ON sa.accomodation_id = a.accomodation_id
-    LEFT JOIN
-        schedules s ON sa.schedule_id = s.schedule_id
-    LEFT JOIN
-        routes r ON s.route_id = r.route_id
-    LEFT JOIN
-        ports r_from ON r.route_from = r_from.port_id
-    LEFT JOIN
-        ports r_to ON r.route_to = r_to.port_id
-    WHERE
-        sa.schedule_accom_id = :schedule_accom_id
+SELECT
+    sa.schedule_accom_id,
+    sa.net_fare,
+    a.accomodation_id,
+    a.accomodation_name,
+    a.accomodation_type,
+    s.schedule_id,
+    s.schedule_time,
+    s.schedule_date,
+    r_from.port_name AS route_from,
+    r_to.port_name AS route_to,
+    sh.ship_name  -- Add ship_name here from the ships table
+FROM
+    schedule_accom sa
+LEFT JOIN
+    accomodations a ON sa.accomodation_id = a.accomodation_id
+LEFT JOIN
+    schedules s ON sa.schedule_id = s.schedule_id
+LEFT JOIN
+    routes r ON s.route_id = r.route_id
+LEFT JOIN
+    ports r_from ON r.route_from = r_from.port_id
+LEFT JOIN
+    ports r_to ON r.route_to = r_to.port_id
+LEFT JOIN
+    ships sh ON s.ship_id = sh.ship_id  -- Join ships table to get ship_name
+WHERE
+    sa.schedule_accom_id = :schedule_accom_id
 ";
+
 
     $stmt = $conn->prepare($query);
     $stmt->bindParam(':schedule_accom_id', $schedule_accom_id, PDO::PARAM_INT);
@@ -241,6 +245,7 @@ if (isset($_POST['book'])) {
                             <div>
                                 <img src="../images/bg/ssr.jpeg" alt="" class="img-fluid">
                                 <h6 class="my-0 mt-4" style="font-size: 19px;"><?php echo $selected_schedule['route_from']; ?> ---- <?php echo $selected_schedule['route_to']; ?></h6>
+                                <h6 class="my-0" style="font-size: 19px;"><?php echo $selected_schedule['ship_name']; ?></h6>
                                 <h6 class="my-0" style="font-size: 19px;"><?php echo number_format($selected_schedule['net_fare'], 2); ?></h6>
                                 <h6 class="my-0" style="font-size: 19px;"><?php echo $selected_schedule['accomodation_name']; ?></h6>
                                 <h6 class="my-0" style="font-size: 19px;"><?php echo isset($selected_schedule['schedule_date']) ? $selected_schedule['schedule_date'] : 'N/A'; ?> / <?php echo isset($selected_schedule['schedule_time']) ? $selected_schedule['schedule_time'] : 'N/A'; ?></h6>

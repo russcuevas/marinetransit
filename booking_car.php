@@ -13,34 +13,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $schedule_date = $_POST['schedule_date'];
 
     $query = "
-    SELECT
-        sa.schedule_accom_id,
-        sa.net_fare,
-        a.accomodation_name,
-        a.accomodation_type,
-        s.schedule_id,
-        s.schedule_date,
-        s.schedule_time,
-        r_from.port_name AS route_from,
-        r_to.port_name AS route_to
-    FROM
-        schedule_accom sa
-    LEFT JOIN
-        accomodations a ON sa.accomodation_id = a.accomodation_id
-    LEFT JOIN
-        schedules s ON sa.schedule_id = s.schedule_id
-    LEFT JOIN
-        routes r ON s.route_id = r.route_id
-    LEFT JOIN
-        ports r_from ON r.route_from = r_from.port_id
-    LEFT JOIN
-        ports r_to ON r.route_to = r_to.port_id
-    WHERE
-        r_from.port_id = :route_from
-        AND r_to.port_id = :route_to
-        AND sa.accomodation_id = :accomodation_id
-        AND s.schedule_date = :schedule_date
-    ";
+SELECT
+    sa.schedule_accom_id,
+    sa.net_fare,
+    a.accomodation_name,
+    a.accomodation_type,
+    s.schedule_id,
+    s.schedule_date,
+    s.schedule_time,
+    r_from.port_name AS route_from,
+    r_to.port_name AS route_to,
+    sh.ship_name  -- Include the ship_name here
+FROM
+    schedule_accom sa
+LEFT JOIN
+    accomodations a ON sa.accomodation_id = a.accomodation_id
+LEFT JOIN
+    schedules s ON sa.schedule_id = s.schedule_id
+LEFT JOIN
+    routes r ON s.route_id = r.route_id
+LEFT JOIN
+    ports r_from ON r.route_from = r_from.port_id
+LEFT JOIN
+    ports r_to ON r.route_to = r_to.port_id
+LEFT JOIN
+    ships sh ON s.ship_id = sh.ship_id  -- Join ships table to get ship_name
+WHERE
+    r_from.port_id = :route_from
+    AND r_to.port_id = :route_to
+    AND sa.accomodation_id = :accomodation_id
+    AND s.schedule_date = :schedule_date
+";
+
 
     $stmt = $conn->prepare($query);
     $stmt->bindParam(':route_from', $route_from, PDO::PARAM_INT);
@@ -218,8 +222,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <thead>
                                 <tr>
                                     <th>Car</th>
-                                    <th>Schedule Date</th>
-                                    <th>Schedule Time</th>
+                                    <th>Ship</th> <!-- Change from 'Car' to 'Ship' -->
+                                    <th>Date</th>
+                                    <th>Time</th>
                                     <th>Routes</th>
                                     <th>Price</th>
                                     <th>Action</th>
@@ -229,7 +234,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <?php
                                 $currentDate = new DateTime();
                                 ?>
-
                                 <?php foreach ($schedules as $schedule): ?>
                                     <?php
                                     $scheduleDate = new DateTime($schedule['schedule_date']);
@@ -239,6 +243,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                     if ($scheduleDateTime >= $currentDate): ?>
                                         <tr>
                                             <td><?php echo $schedule['accomodation_name']; ?></td>
+                                            <td><?php echo $schedule['ship_name']; ?></td>
                                             <td><?php echo $schedule['schedule_date']; ?></td>
                                             <td>
                                                 <?php
@@ -247,7 +252,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                             </td>
                                             <td><?php echo $schedule['route_from']; ?> - <?php echo $schedule['route_to']; ?></td>
                                             <td><?php echo number_format($schedule['net_fare'], 2); ?></td>
-
                                             <td>
                                                 <a href="selected_booking_car.php?schedule_accom_id=<?php echo $schedule['schedule_accom_id']; ?>" class="btn btn-info">Select</a>
                                             </td>
@@ -266,6 +270,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     </div>
                 </div>
             <?php endif; ?>
+
 
 
         </div>
