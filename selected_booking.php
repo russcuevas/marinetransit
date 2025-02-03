@@ -137,8 +137,8 @@ if (isset($_POST['book'])) {
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
-        $mail->Username = 'gmanagementtt111@gmail.com';
-        $mail->Password = 'skbtosbmkiffrajr';
+        $mail->Username = 'marinetransitbalingoanport@gmail.com';
+        $mail->Password = 'ygxwoiybctgwiigk';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 

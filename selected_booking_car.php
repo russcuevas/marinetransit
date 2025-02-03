@@ -179,12 +179,12 @@ if (isset($_POST['book'])) {
     $mail->isSMTP();
     $mail->Host = 'smtp.gmail.com';
     $mail->SMTPAuth = true;
-    $mail->Username = 'gmanagementtt111@gmail.com';
-    $mail->Password = 'skbtosbmkiffrajr'; // Make sure this is correct and secure
+    $mail->Username = 'marinetransitbalingoanport@gmail.com';
+    $mail->Password = 'ygxwoiybctgwiigk'; // Make sure this is correct and secure
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
     $mail->Port = 587;
 
-    $mail->setFrom('gmanagementtt111@gmail.com', 'Marine Transit Booking');
+    $mail->setFrom('marinetransitbalingoanport@gmail.com', 'Marine Transit Booking');
     $mail->addAddress($contact_email, $contact_person);
 
     $mail->isHTML(true);

@@ -1,5 +1,10 @@
 <?php
 session_start();
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require 'vendor/autoload.php';
 include 'connection/database.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['send-ratings'])) {
@@ -11,6 +16,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['send-ratings'])) {
     $stmt = $conn->prepare($insert_query);
     if ($stmt->execute([$name, $email, $message])) {
         $_SESSION['success'] = 'Ratings added successfully!';
+        $mail = new PHPMailer(true);
+
+        try {
+            $mail->isSMTP();
+            $mail->Host = 'smtp.gmail.com';
+            $mail->SMTPAuth = true;
+            $mail->Username = 'marinetransitbalingoanport@gmail.com';
+            $mail->Password = 'ygxwoiybctgwiigk';
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port = 587;
+
+            $mail->setFrom('your_email@example.com', 'Marine Transit Booking');
+            $mail->addAddress('marinetransitbalingoanport@gmail.com', 'Marine Transit');
+
+            $mail->isHTML(true);
+            $mail->Subject = 'Ratings';
+            $mail->Body = "<h3>Thank You for Your Rating!</h3>
+               <p>Thank you for taking the time to rate our services. We truly appreciate your feedback.</p>
+               <p>Rating:</p>
+               <p><strong>Name:</strong> $name</p>
+               <p><strong>Email:</strong> $email</p>
+               <p><strong>Message:</strong> $message</p>";
+
+
+            $mail->send();
+        } catch (Exception $e) {
+            $_SESSION['error'] = 'Error sending email: ' . $mail->ErrorInfo;
+        }
+
         header('Location: contactus.php');
         exit;
     } else {
