@@ -99,104 +99,103 @@ $current_time = date('H:i:s');
         <div class=" container">
             <form id="AddSchedule" class="user" method="POST">
                 <input type="hidden" name="ticket_type" id="ticket_type" value="passenger">
-                <div style="background-color: black;">
-
-                    <div class="col-lg-12"
-                        style="padding: 10px; display: flex; flex-direction: row; align-items: start; text-align: start; justify-content: center;">
-
-                        <div class="col-sm-4" style="display: flex; padding: 50px; flex-direction: column; gap: 10px;">
-                            <button class="btn btn-info" id="btn1" type="button"
-                                onclick="window.location.href='booknow.php'"><i class=" fa fa-user"></i>
-                                Passenger</button>
-                            <button class="btn btn-info" id="btn2" type="button"
-                                onclick="window.location.href='booking_car.php'">
+                <div class="bg-dark text-light p-4 rounded">
+                    <div class="row justify-content-center">
+                        <div class="col-12 col-md-4 d-flex flex-column gap-3 text-center text-md-start">
+                            <button class="btn btn-info" id="btn1" type="button" onclick="window.location.href='booknow.php'">
+                                <i class="fa fa-user"></i> Passenger
+                            </button>
+                            <button class="btn btn-info" id="btn2" type="button" onclick="window.location.href='booking_car.php'">
                                 <i class="fa fa-car"></i> Car
                             </button>
                         </div>
 
-                        <div class="col-sm-4" style="display: flex; flex-direction: column; gap: 10px;">
+                        <div class="col-12 col-md-4 d-flex flex-column gap-3">
                             <div class="input-group">
-                                <div class="input-group">From</div>
+                                <label class="input-group-text">From</label>
                                 <select class="form-control" name="route_from" id="route_from" required>
                                     <?php foreach ($ports as $port): ?>
-                                        <option value="<?php echo $port['port_id']; ?>"><?php echo $port['port_name']; ?></option>
+                                        <option value="<?php echo $port['port_id']; ?>">
+                                            <?php echo $port['port_name']; ?>
+                                        </option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
 
                             <div class="input-group">
-                                <div class="input-group">To &nbsp;&nbsp;&nbsp;&nbsp;</div>
+                                <label class="input-group-text">To</label>
                                 <select class="form-control" name="route_to" id="route_to" required>
                                     <?php foreach ($ports as $port): ?>
-                                        <option value="<?php echo $port['port_id']; ?>"><?php echo $port['port_name']; ?></option>
+                                        <option value="<?php echo $port['port_id']; ?>">
+                                            <?php echo $port['port_name']; ?>
+                                        </option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
                         </div>
 
-                        <div class="col-sm-4" style="display: flex; flex-direction: column; gap: 10px;">
+                        <div class="col-12 col-md-4 d-flex flex-column gap-3">
                             <div class="input-group">
-                                <div class="input-group">Depart</div>
+                                <label class="input-group-text">Depart</label>
                                 <input class="form-control" required type="date" name="schedule_date" id="schedule_date" min="<?= date('Y-m-d') ?>">
-
                             </div>
 
                             <div id="section1">
-                                <div class="input-group" style="margin-bottom: 10px">
-                                    <div class="input-group">No. of Passenger</div>
+                                <div class="input-group mb-3">
+                                    <label class="input-group-text">No. of Passenger</label>
                                     <input class="form-control" type="number" name="passenger_no" id="passenger_no" min="1">
-
                                 </div>
-                                <button style="float: right;" class="btn btn-info" id="btn2" type="submit"><i
-                                        class="fa fa-search"></i> Search Trips</button>
+                                <button class="btn btn-info w-100" id="btn2" type="submit">
+                                    <i class="fa fa-search"></i> Search Trips
+                                </button>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </form>
+
 
             <?php if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($schedules)): ?>
                 <div class="row" style="padding: 15px;">
                     <div class="col-sm-12" style="background-color:rgb(34, 92, 143); padding: 50px;">
                         <h3 style="color: white!important"><strong>Available Schedules:</strong></h3>
-                        <table class="table table-bordered" style="color: white; background-color: black;" id="myTable">
-                            <thead>
-                                <tr>
-                                    <th>Ship</th>
-                                    <th>Date</th>
-                                    <th>Time</th>
-                                    <th>Routes</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php
-                                $currentDate = new DateTime();
-                                ?>
-                                <?php foreach ($schedules as $schedule): ?>
+                        <div class="table-responsive"> <!-- Added for responsiveness -->
+                            <table class="table table-bordered table-striped" style="color: white; background-color: black;" id="myTable">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>Ship</th>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Routes</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                                     <?php
-                                    $scheduleDate = new DateTime($schedule['schedule_date']);
-                                    $scheduleTime = DateTime::createFromFormat('H:i:s', $schedule['schedule_time']);
-                                    $scheduleDateTime = $scheduleDate->setTime($scheduleTime->format('H'), $scheduleTime->format('i'));
-                                    if ($scheduleDateTime >= $currentDate): ?>
-                                        <tr>
-                                            <td><?php echo $schedule['ship_name']; ?></td>
-                                            <td><?php echo $schedule['schedule_date']; ?></td>
-                                            <td>
-                                                <?php
-                                                echo $scheduleTime ? $scheduleTime->format('h:i A') : 'Invalid Time';
-                                                ?>
-                                            </td>
-                                            <td><?php echo $schedule['route_from']; ?> - <?php echo $schedule['route_to']; ?></td>
-                                            <td>
-                                                <a href="selected_booking.php?schedule_id=<?php echo $schedule['schedule_id']; ?>" class="btn btn-info">Select</a>
-                                            </td>
-                                        </tr>
-                                    <?php endif; ?>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
+                                    $currentDate = new DateTime();
+                                    ?>
+                                    <?php foreach ($schedules as $schedule): ?>
+                                        <?php
+                                        $scheduleDate = new DateTime($schedule['schedule_date']);
+                                        $scheduleTime = DateTime::createFromFormat('H:i:s', $schedule['schedule_time']);
+                                        $scheduleDateTime = $scheduleDate->setTime($scheduleTime->format('H'), $scheduleTime->format('i'));
+                                        if ($scheduleDateTime >= $currentDate): ?>
+                                            <tr>
+                                                <td><?php echo htmlspecialchars($schedule['ship_name']); ?></td>
+                                                <td><?php echo htmlspecialchars($schedule['schedule_date']); ?></td>
+                                                <td>
+                                                    <?php echo $scheduleTime ? $scheduleTime->format('h:i A') : 'Invalid Time'; ?>
+                                                </td>
+                                                <td><?php echo htmlspecialchars($schedule['route_from']) . " - " . htmlspecialchars($schedule['route_to']); ?></td>
+                                                <td>
+                                                    <a href="selected_booking.php?schedule_id=<?php echo htmlspecialchars($schedule['schedule_id']); ?>" class="btn btn-info btn-sm">Select</a>
+                                                </td>
+                                            </tr>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div> <!-- End of table-responsive -->
                     </div>
                 </div>
             <?php elseif ($_SERVER['REQUEST_METHOD'] === 'POST'): ?>
