@@ -32,6 +32,33 @@ if (isset($_POST['ticket_code'])) {
             exit();
         }
 
+        // Insert into reports table
+        $insertQuery = "INSERT INTO reports (
+            ticket_code, ticket_price, ticket_type, ticket_status, 
+            schedule_id, user_id, ticket_vehicle, contact_person, 
+            contact_number, contact_email, contact_address
+        ) VALUES (
+            :ticket_code, :ticket_price, :ticket_type, 'Completed', 
+            :schedule_id, :user_id, :ticket_vehicle, :contact_person, 
+            :contact_number, :contact_email, :contact_address
+        )";
+
+        $insertStmt = $conn->prepare($insertQuery);
+        $insertStmt->bindParam(':ticket_code', $ticket['ticket_code']);
+        $insertStmt->bindParam(':ticket_price', $ticket['ticket_price']);
+        $insertStmt->bindParam(':ticket_type', $ticket['ticket_type']);
+        $insertStmt->bindParam(':schedule_id', $ticket['schedule_id']);
+        $insertStmt->bindParam(
+            ':user_id',
+            $ticket['user_id']
+        );
+        $insertStmt->bindParam(':ticket_vehicle', $ticket['ticket_vehicle']);
+        $insertStmt->bindParam(':contact_person', $ticket['contact_person']);
+        $insertStmt->bindParam(':contact_number', $ticket['contact_number']);
+        $insertStmt->bindParam(':contact_email', $ticket['contact_email']);
+        $insertStmt->bindParam(':contact_address', $ticket['contact_address']);
+        $insertStmt->execute();
+
         // Fetch passenger details
         $passengerQuery = "SELECT passenger_fname, passenger_lname, passenger_contact, passenger_type, passenger_gender
                            FROM passengers WHERE ticket_id IN (SELECT ticket_id FROM tickets WHERE ticket_code = :ticket_code)";
