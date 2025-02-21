@@ -139,7 +139,7 @@ $ratings = $ratings_stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="col-md-7 heading-section text-center ftco-animate">
                     <span class="subheading">ENHANCING BALINGOAN PORT TRANSPORTATION
                         EFFECIENCY THROUGH TECHNOLOGY A
-                        WEB--BASED TICKETING</span>
+                        WEB--BASED TICKETING RESERVATION SYSTEM</span>
                     <h2 class="mb-4">Our Services</h2>
                 </div>
             </div>

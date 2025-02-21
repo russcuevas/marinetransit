@@ -131,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['send-ratings'])) {
                 </div>
                 <div class="col-md-4 d-flex">
                     <div class="info rounded bg-white p-4">
-                        <p><span>Email:</span> <a href="mailto:info@yoursite.com">supershuttleferry.com</a></p>
+                        <p><span>Email:</span> <a href="mailto:marinetransitbalingoanport@gmail.com">marinetransitbalingoanport@gmail.com</a></p>
                     </div>
                 </div>
             </div>

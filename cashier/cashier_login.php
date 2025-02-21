@@ -100,7 +100,7 @@ if (isset($_POST['login'])) {
                                 <div class="col-lg-8 d-flex align-items-center justify-content-center">
                                     <div class="p-4">
                                         <div class="row col-lg-12 d-flex align-items-center  justify-content-center">
-                                            <img class="img-profile mx-2 rounded-circle" src="assets/admin/img/avatar2.png" style="height: 50px; width: auto;">
+                                            <img class="img-profile mx-2 rounded-circle" src="assets/admin/img/cashier.jpg" style="height: 50px; width: auto;">
                                             <h2>Cashier Login</h2>
                                         </div>
                                         <div class="form-group my-5">
