@@ -123,122 +123,147 @@ $cargos = $cargo_stmt->fetchAll(PDO::FETCH_ASSOC);
 <script>
     $(document).on('click', '.mark-paid-ticket-cargo', function() {
         var ticket_code = $(this).data('id');
-        if (confirm('Are you sure this ticket is paid?')) {
-            $.ajax({
-                type: 'POST',
-                url: 'mark_paid_ticket_cargo.php',
-                data: {
-                    ticket_code: ticket_code
-                },
-                success: function(response) {
-                    var res = JSON.parse(response);
 
-                    if (res.status === 'success') {
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Booking confirmation successfully paid!',
-                            icon: 'success',
-                            confirmButtonText: 'OK'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Are you sure this ticket is paid?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, mark as paid',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Processing...',
+                    text: 'Please wait while we update the ticket status.',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading(); // Show loading spinner
+                    }
+                });
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'mark_paid_ticket_cargo.php',
+                    data: {
+                        ticket_code: ticket_code
+                    },
+                    success: function(response) {
+                        var res = JSON.parse(response);
+                        Swal.close(); // Close the loading Swal
+
+                        if (res.status === 'success') {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: 'Booking confirmation successfully paid!',
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
                                 location.reload();
-                            }
-                        });
-                    } else if (res.status === 'failure') {
-                        Swal.fire({
-                            title: 'Failed!',
-                            text: res.message || 'Failed to update ticket status or insert report.',
-                            icon: 'error',
-                            confirmButtonText: 'OK'
-                        });
-                    } else if (res.status === 'error') {
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Failed!',
+                                text: res.message || 'Failed to update ticket status or insert report.',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.close(); // Close the loading Swal
                         Swal.fire({
                             title: 'Error!',
-                            text: res.message || 'An unexpected error occurred. Please try again later.',
+                            text: 'An error occurred. Please try again later.',
                             icon: 'error',
                             confirmButtonText: 'OK'
                         });
                     }
-                },
-                error: function(xhr, status, error) {
-                    Swal.fire({
-                        title: 'Error!',
-                        text: 'An error occurred. Please try again later.',
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            });
-        }
+                });
+            }
+        });
     });
 </script>
+
 
 <script>
     $(document).on('click', '.cancel-ticket-cargo', function() {
         var ticket_code = $(this).data('id');
 
         Swal.fire({
-            title: 'Processing...',
-            text: 'Please wait while we cancel the tickets.',
-            icon: 'info',
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-            showConfirmButton: false,
-            didOpen: () => {
-                Swal.showLoading(); // Show loading spinner
-            }
-        });
+            title: 'Are you sure?',
+            text: 'Do you really want to cancel this ticket?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, cancel it',
+            cancelButtonText: 'No, keep it'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Processing...',
+                    text: 'Please wait while we cancel the ticket.',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading(); // Show loading spinner
+                    }
+                });
 
-        $.ajax({
-            type: 'POST',
-            url: 'cancel_ticket_cargo.php',
-            data: {
-                ticket_code: ticket_code
-            },
-            success: function(response) {
-                try {
-                    console.log("Raw Response:", response); // Log response before parsing
-                    var res = typeof response === "object" ? response : JSON.parse(response);
-                    console.log("Parsed Response:", res); // Log the parsed response
+                $.ajax({
+                    type: 'POST',
+                    url: 'cancel_ticket_cargo.php',
+                    data: {
+                        ticket_code: ticket_code
+                    },
+                    success: function(response) {
+                        try {
+                            console.log("Raw Response:", response); // Log response before parsing
+                            var res = typeof response === "object" ? response : JSON.parse(response);
+                            console.log("Parsed Response:", res); // Log parsed response
 
-                    Swal.close(); // Close loading state
+                            Swal.close(); // Close loading state
 
-                    if (res.status === "success") {
-                        Swal.fire({
-                            title: "Success!",
-                            text: res.message || "Cancelled Booking Payment",
-                            icon: "success",
-                            confirmButtonText: "OK",
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                location.reload();
+                            if (res.status === "success") {
+                                Swal.fire({
+                                    title: "Success!",
+                                    text: res.message || "Ticket successfully cancelled.",
+                                    icon: "success",
+                                    confirmButtonText: "OK",
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: "Failed!",
+                                    text: res.message || "Failed to cancel the ticket.",
+                                    icon: "error",
+                                    confirmButtonText: "OK",
+                                });
                             }
-                        });
-                    } else {
+                        } catch (error) {
+                            console.error("JSON Parse Error:", error, response);
+                            Swal.fire({
+                                title: "Error!",
+                                text: "Invalid server response. Please try again later.",
+                                icon: "error",
+                                confirmButtonText: "OK",
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.close();
                         Swal.fire({
-                            title: "Failed!",
-                            text: res.message || "Failed to cancel tickets.",
+                            title: "Error!",
+                            text: "An error occurred. Please try again later.",
                             icon: "error",
                             confirmButtonText: "OK",
                         });
                     }
-                } catch (error) {
-                    console.error("JSON Parse Error:", error, response);
-                    Swal.fire({
-                        title: "Error!",
-                        text: "Invalid server response. Please try again later.",
-                        icon: "error",
-                        confirmButtonText: "OK",
-                    });
-                }
-            },
-            error: function() {
-                Swal.close();
-                Swal.fire({
-                    title: "Error!",
-                    text: "An error occurred. Please try again later.",
-                    icon: "error",
-                    confirmButtonText: "OK",
                 });
             }
         });
